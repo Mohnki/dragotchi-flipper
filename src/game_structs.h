@@ -2,6 +2,7 @@
 #define __game_structs_h__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /* Messages from the GUI/main thread to the logic thread */
 enum ThreadsMessageType {
@@ -89,6 +90,7 @@ struct PersistentGameState {
     uint32_t sick_since; // when became sick; 0 = healthy
     uint8_t sick_penalized; // care already docked for this illness episode
     uint8_t lights_off; // 1 = user allowed sleep (lights out)
+    uint32_t last_sleep_update; // cursor for awake-at-night checks
 
     // Hidden drivers
     int32_t care_score; // 0..100
