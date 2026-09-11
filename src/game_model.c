@@ -14,7 +14,7 @@ void game_state_init(struct GameState *gs, uint32_t now) {
     p->lights_off = 0; p->last_sleep_update = now;
     p->care_score = CARE_START;
     p->discipline = DISCIPLINE_START;
-    p->attention_call = 0; p->last_attention_update = now;
+    p->attention_call = 0; p->last_attention_update = now; p->last_oldage_update = now;
     gs->next_animation_index = 0;
     gs->display_state = DISP_IDLE;
 }

@@ -97,6 +97,7 @@ struct PersistentGameState {
     uint32_t discipline; // 0..100
     uint8_t attention_call; // 1 = calling with no real need
     uint32_t last_attention_update; // cursor for attention-call checks
+    uint32_t last_oldage_update; // cursor for old-age death checks (adult)
 };
 
 struct PersistentSettings {

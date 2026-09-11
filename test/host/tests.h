@@ -4,3 +4,4 @@ void run_model_tests(void);
 void run_needs_tests(void);
 void run_states_tests(void);
 void run_discipline_tests(void);
+void run_evolution_tests(void);
