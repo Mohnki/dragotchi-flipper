@@ -31,6 +31,7 @@ GameEventFlags advance_state(struct GameState *gs, uint32_t now) {
     f |= check_evolution(gs, now);
     f |= check_old_age(gs, now);
     refresh_display(gs, now);
+    if(f & EVT_EVOLVED) gs->display_state = DISP_EVOLVING; // brief poof
     return f;
 }
 

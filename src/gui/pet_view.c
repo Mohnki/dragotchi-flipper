@@ -18,12 +18,66 @@ typedef struct {
 static const char *ACTION_NAMES[PET_ACTION_COUNT] =
     {"Feed", "Play", "Clean", "Med", "Scold", "Lights"};
 
+static void draw_heart(Canvas *c, int x, int y) {
+    canvas_draw_dot(c, x, y);     canvas_draw_dot(c, x + 2, y);
+    canvas_draw_dot(c, x - 1, y + 1); canvas_draw_dot(c, x + 1, y + 1); canvas_draw_dot(c, x + 3, y + 1);
+    canvas_draw_dot(c, x, y + 2);  canvas_draw_dot(c, x + 1, y + 2); canvas_draw_dot(c, x + 2, y + 2);
+    canvas_draw_dot(c, x + 1, y + 3);
+}
+
+static void draw_state_overlay(Canvas *c, uint8_t display_state, uint32_t f) {
+    int p = (int)(f & 1u);
+    switch(display_state) {
+        case DISP_SLEEPING:
+            canvas_set_font(c, FontSecondary);
+            canvas_draw_str(c, 40, 12 - p * 2, "z");
+            canvas_draw_str(c, 46, 8 - p * 2, "Z");
+            break;
+        case DISP_SICK: {
+            int dy = p * 2;
+            canvas_draw_disc(c, 46, 14 + dy, 1);   // sweat drop, dripping
+            break;
+        }
+        case DISP_PLAYING:
+            draw_heart(c, 42, 8 - p * 2);          // heart rising
+            break;
+        case DISP_EATING:
+            canvas_draw_dot(c, 8 + p, 34);         // crumbs near the snout
+            canvas_draw_dot(c, 12, 36 - p);
+            canvas_draw_dot(c, 6, 37);
+            break;
+        case DISP_EVOLVING: {
+            const int sx[4] = {6, 58, 10, 54};
+            const int sy[4] = {6, 8, 50, 46};
+            for(int i = 0; i < 4; i++) {
+                int x = sx[i], y = sy[i] + (p ? 0 : 1);
+                canvas_draw_line(c, x - 2, y, x + 2, y);
+                canvas_draw_line(c, x, y - 2, x, y + 2);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 static void pet_draw_callback(Canvas *canvas, void *model) {
     PetModel *m = model;
     canvas_clear(canvas);
 
+    // State-specific motion, then sprite, then animated overlay.
+    int dx = 0, dy = 0;
+    int p = (int)(m->frame & 1u);
+    switch(m->display_state) {
+        case DISP_IDLE:     dy = p ? 0 : 1; break;   // gentle bob
+        case DISP_SICK:     dx = p ? 1 : -1; break;  // shivering
+        case DISP_PLAYING:  dy = p ? -2 : 0; break;  // bouncing
+        case DISP_EATING:   dx = p; break;           // chomping
+        default:            break;                    // sleeping/dead: still
+    }
     const Icon *icon = decode_image_for(m->stage, m->alignment, m->display_state, m->frame);
-    canvas_draw_icon(canvas, 2, 2, icon);
+    canvas_draw_icon(canvas, 2 + dx, 2 + dy, icon);
+    draw_state_overlay(canvas, m->display_state, m->frame);
 
     char buf[20];
     canvas_set_font(canvas, FontSecondary);
