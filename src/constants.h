@@ -2,6 +2,7 @@
 #define __constants_h__
 
 #include <storage/storage.h> // For APP_DATA_PATH
+#include "tuning.h"
 
 /* Delay between two background activities performed
  * by secondary_thread */
@@ -22,19 +23,20 @@ static const char ABOUT_TEXT[] = "Matagotchi\n"
                                  "For more info visit\n"
                                  "github.com/MrModd/Matagotchi";
 
-static const char LIFE_STAGE_STRING[][6] = {"Egg",
-                                            "Baby",
-                                            "Child",
-                                            "Teen",
-                                            "Adult",
-                                            "Dead"};
+static const char LIFE_STAGE_STRING[][10] = {"Egg",
+                                             "Hatchling",
+                                             "Wyrmling",
+                                             "Drake",
+                                             "Adult",
+                                             "Dead"};
+static const char ALIGNMENT_STRING[][6] = {"", "White", "Grey", "Black"};
 
 /* Game state file info */
 #define GAME_STATE_STORAGE_STATE_FILENAME "dragotchi.save"
 #define GAME_STATE_STORAGE_SETTINGS_FILENAME "dragotchi.settings"
 #define GAME_STATE_STORAGE_STATE_PATH APP_DATA_PATH(GAME_STATE_STORAGE_STATE_FILENAME)
 #define GAME_STATE_STORAGE_SETTINGS_PATH APP_DATA_PATH(GAME_STATE_STORAGE_SETTINGS_FILENAME)
-#define GAME_STATE_HEADER_MAGIC 0xFE
+#define GAME_STATE_HEADER_MAGIC 0xD6
 #define GAME_STATE_HEADER_VERSION 0x01
 
 /* Game parameters */

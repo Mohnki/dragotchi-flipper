@@ -2,43 +2,98 @@
 #define __game_structs_h__
 
 #include <stdint.h>
-#include <furi_hal.h>
 
+/* Messages from the GUI/main thread to the logic thread */
 enum ThreadsMessageType {
-    SAVE_AND_EXIT, // Request to exit the program, save the state and quit the thread
-    RESET_STATE, // Reset the persisted state and return to the main view
-    PROCESS_CANDY, // User requested to give food
-    PROCESS_PILL // User requested to give a pill
+    SAVE_AND_EXIT,
+    RESET_STATE,
+    PROCESS_FEED,
+    PROCESS_PLAY,
+    PROCESS_CLEAN,
+    PROCESS_MEDICINE,
+    PROCESS_SCOLD,
+    TOGGLE_LIGHTS
 };
 
-/* Request from main thread to be processed by secondary thread */
 struct ThreadsMessage {
     enum ThreadsMessageType type;
-    // Filled with other field in case there's the need
-    // to pass an argument for a specific message type
 };
 
 enum LifeStage {
     EGG,
-    BABY,
-    CHILD,
-    TEEN,
+    HATCHLING,
+    WYRMLING,
+    DRAKE,
     ADULT,
     DEAD,
     LIFE_STAGES_NUM
 };
 
+/* Adult character, chosen by care quality at the Drake->Adult branch */
+enum DragonAlignment {
+    ALIGN_NONE, // not yet adult
+    ALIGN_WHITE, // raised very well
+    ALIGN_GREY,  // middling
+    ALIGN_BLACK, // neglected
+    DRAGON_ALIGNMENTS_NUM
+};
+
+/* Transient animation/display hint (not persisted) */
+enum DisplayState {
+    DISP_IDLE,
+    DISP_EATING,
+    DISP_PLAYING,
+    DISP_SICK,
+    DISP_SLEEPING,
+    DISP_EVOLVING,
+    DISP_DEAD
+};
+
+/* Event flags returned by advance/action functions so the device layer can
+ * decide sound/vibration and build the "while you were away" summary. */
+typedef uint32_t GameEventFlags;
+#define EVT_NONE 0u
+#define EVT_EVOLVED (1u << 0)
+#define EVT_STARVING (1u << 1) // hunger reached 0
+#define EVT_SICK (1u << 2) // became sick
+#define EVT_POOPED (1u << 3) // new poop appeared
+#define EVT_DIED (1u << 4) // died (any cause)
+#define EVT_CALL (1u << 5) // discipline/attention call raised
+#define EVT_HEALED (1u << 6) // recovered from sickness (via care)
+#define EVT_FED (1u << 7)
+#define EVT_PLAYED (1u << 8)
+#define EVT_CLEANED (1u << 9)
+
+/* Persisted game state (saved to storage) */
 struct PersistentGameState {
-    enum LifeStage stage;
-    // Feature XP
-    uint32_t xp;
-    uint32_t last_recorded_xp_update; // Timestamp converted from FuriHalRtcDateTime
-    // Feature HU
-    uint32_t hu;
-    uint32_t last_recorded_hu_update; // Same as above
-    // Feature HP
-    uint32_t hp;
-    uint32_t last_recorded_hp_update; // Same as above
+    uint8_t stage; // enum LifeStage
+    uint8_t alignment; // enum DragonAlignment
+    uint32_t birth_timestamp; // for age
+    uint32_t stage_entered_timestamp; // age within current stage
+
+    // Needs
+    uint32_t hunger;
+    uint32_t last_hunger_update;
+    uint32_t happiness;
+    uint32_t last_happiness_update;
+    uint32_t health;
+    uint32_t last_health_update;
+
+    // States
+    uint8_t poop; // 0..MAX_POOP
+    uint32_t last_poop_update;
+    uint32_t poop_since; // when current (uncleaned) poop first appeared; 0 = clean
+    uint8_t poop_penalized; // care already docked for this poop episode
+    uint8_t sick; // 0/1
+    uint32_t last_sick_update;
+    uint32_t sick_since; // when became sick; 0 = healthy
+    uint8_t sick_penalized; // care already docked for this illness episode
+    uint8_t lights_off; // 1 = user allowed sleep (lights out)
+
+    // Hidden drivers
+    int32_t care_score; // 0..100
+    uint32_t discipline; // 0..100
+    uint8_t attention_call; // 1 = calling with no real need
 };
 
 struct PersistentSettings {
@@ -46,21 +101,12 @@ struct PersistentSettings {
     uint8_t sound;
 };
 
-/* Internal state of the game. Some of the info are persisted on
- * the storage */
 struct GameState {
     struct PersistentGameState persistent;
     struct PersistentSettings settings;
-    // Transient information
+    // Transient
     uint32_t next_animation_index;
+    uint8_t display_state; // enum DisplayState
 };
 
-struct GameEvents {
-    uint32_t xp; // How many new XP to assign
-    uint32_t xp_timestamp; // New timestamp to use in the GameState
-    int32_t hu; // How many HU to add or remove
-    uint32_t hu_timestamp; // Timestamp to use in the GameState
-    int32_t hp; // How many HP to add or remove
-    uint32_t hp_timestamp; // Timestamp to use in the GameState
-};
 #endif

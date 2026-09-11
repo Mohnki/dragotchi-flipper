@@ -1,0 +1,20 @@
+#include "game_model.h"
+#include "tuning.h"
+void game_state_init(struct GameState *gs, uint32_t now) {
+    struct PersistentGameState *p = &gs->persistent;
+    p->stage = EGG;
+    p->alignment = ALIGN_NONE;
+    p->birth_timestamp = now;
+    p->stage_entered_timestamp = now;
+    p->hunger = MAX_HU;          p->last_hunger_update = now;
+    p->happiness = MAX_HAPPINESS; p->last_happiness_update = now;
+    p->health = MAX_HP;          p->last_health_update = now;
+    p->poop = 0;  p->last_poop_update = now; p->poop_since = 0; p->poop_penalized = 0;
+    p->sick = 0;  p->last_sick_update = now; p->sick_since = 0; p->sick_penalized = 0;
+    p->lights_off = 0;
+    p->care_score = CARE_START;
+    p->discipline = DISCIPLINE_START;
+    p->attention_call = 0;
+    gs->next_animation_index = 0;
+    gs->display_state = DISP_IDLE;
+}

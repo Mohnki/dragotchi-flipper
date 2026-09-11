@@ -1,12 +1,14 @@
 CC ?= gcc
 CFLAGS ?= -std=c11 -Wall -Wextra -O0 -g -I. -Istub -I../../src
 SRCDIR = ../../src
-COMMON = $(SRCDIR)/random_generator.c furi_stub.c
+LOGIC = $(SRCDIR)/random_generator.c $(SRCDIR)/care.c $(SRCDIR)/game_model.c
+STUBS = furi_stub.c
+TESTS = test_runner.c test_rng.c test_model.c
 BUILD = build
 
-$(BUILD)/tests: test_runner.c $(COMMON) rng_control.h stub/furi.h stub/furi_hal.h
+$(BUILD)/tests: $(TESTS) $(LOGIC) $(STUBS) tests.h test_util.h rng_control.h stub/furi.h stub/furi_hal.h
 	@mkdir -p $(BUILD)
-	$(CC) $(CFLAGS) test_runner.c $(COMMON) -o $(BUILD)/tests
+	$(CC) $(CFLAGS) $(TESTS) $(LOGIC) $(STUBS) -o $(BUILD)/tests
 
 .PHONY: run clean
 run: $(BUILD)/tests
