@@ -4,6 +4,7 @@ App(
     apptype=FlipperAppType.EXTERNAL,
     entry_point="dragotchi_app",
     requires=["gui"],
+    sources=["src/*.c", "src/gui/*.c", "src/gui/scenes/*.c", "src/gui/custom_modules/*.c"],
     stack_size=2 * 1024,
     fap_icon="dragotchi_10px.png",
     fap_icon_assets="assets",

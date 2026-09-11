@@ -1,0 +1,118 @@
+#include <furi.h>
+#include <stdio.h>
+#include <gui/view.h>
+#include <gui/view_dispatcher.h>
+
+#include "pet_view.h"
+#include "game_decoder.h"
+#include "../flipper_structs.h"
+
+typedef struct {
+    uint8_t stage, alignment, display_state;
+    uint32_t hunger, happiness, health;
+    uint8_t poop, sick, night, call;
+    uint32_t frame;
+    uint8_t selected;
+} PetModel;
+
+static const char *ACTION_NAMES[PET_ACTION_COUNT] =
+    {"Feed", "Play", "Clean", "Med", "Scold", "Lights"};
+
+static void pet_draw_callback(Canvas *canvas, void *model) {
+    PetModel *m = model;
+    canvas_clear(canvas);
+
+    const Icon *icon = decode_image_for(m->stage, m->alignment, m->display_state, m->frame);
+    canvas_draw_icon(canvas, 2, 2, icon);
+
+    char buf[20];
+    canvas_set_font(canvas, FontSecondary);
+    snprintf(buf, sizeof(buf), "Hu %lu", (unsigned long)m->hunger);
+    canvas_draw_str(canvas, 66, 9, buf);
+    snprintf(buf, sizeof(buf), "Jo %lu", (unsigned long)m->happiness);
+    canvas_draw_str(canvas, 66, 19, buf);
+    snprintf(buf, sizeof(buf), "Hp %lu", (unsigned long)m->health);
+    canvas_draw_str(canvas, 66, 29, buf);
+
+    char flags[24];
+    snprintf(flags, sizeof(flags), "%s%s%s%s",
+             m->sick ? "SICK " : "",
+             m->poop ? "DIRTY " : "",
+             (m->display_state == DISP_SLEEPING) ? "Zzz " : "",
+             m->call ? "!" : "");
+    canvas_draw_str(canvas, 66, 39, flags);
+
+    snprintf(buf, sizeof(buf), "< %s >", ACTION_NAMES[m->selected % PET_ACTION_COUNT]);
+    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_str(canvas, 66, 52, buf);
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 66, 62, "OK  ^stat vset");
+}
+
+static bool pet_input_callback(InputEvent *event, void *context) {
+    struct ApplicationContext *app = (struct ApplicationContext *)context;
+    if(event->type != InputTypeShort) return false;
+    switch(event->key) {
+        case InputKeyLeft:
+        case InputKeyRight: {
+            bool right = (event->key == InputKeyRight);
+            with_view_model(
+                app->pet_view, PetModel * m,
+                {
+                    m->selected = right
+                        ? (uint8_t)((m->selected + 1) % PET_ACTION_COUNT)
+                        : (uint8_t)((m->selected + PET_ACTION_COUNT - 1) % PET_ACTION_COUNT);
+                },
+                true);
+            return true;
+        }
+        case InputKeyOk: {
+            uint8_t sel = 0;
+            with_view_model(app->pet_view, PetModel * m, { sel = m->selected; }, false);
+            view_dispatcher_send_custom_event(app->view_dispatcher, sel);
+            return true;
+        }
+        case InputKeyUp:
+            view_dispatcher_send_custom_event(app->view_dispatcher, PET_EVT_STATS);
+            return true;
+        case InputKeyDown:
+            view_dispatcher_send_custom_event(app->view_dispatcher, PET_EVT_SETTINGS);
+            return true;
+        default:
+            return false; // Back handled by navigation callback
+    }
+}
+
+View *pet_view_alloc(void *context) {
+    View *view = view_alloc();
+    view_set_context(view, context);
+    view_set_draw_callback(view, pet_draw_callback);
+    view_set_input_callback(view, pet_input_callback);
+    view_allocate_model(view, ViewModelTypeLocking, sizeof(PetModel));
+    with_view_model(view, PetModel * m, { m->selected = 0; m->stage = EGG; }, true);
+    return view;
+}
+
+void pet_view_free(View *view) {
+    view_free(view);
+}
+
+void pet_view_update(View *view, const struct GameState *gs, bool night) {
+    const struct PersistentGameState *p = &gs->persistent;
+    with_view_model(
+        view, PetModel * m,
+        {
+            m->stage = p->stage;
+            m->alignment = p->alignment;
+            m->display_state = gs->display_state;
+            m->hunger = p->hunger;
+            m->happiness = p->happiness;
+            m->health = p->health;
+            m->poop = p->poop;
+            m->sick = p->sick;
+            m->night = night ? 1 : 0;
+            m->call = p->attention_call;
+            m->frame = gs->next_animation_index;
+        },
+        true);
+}

@@ -1,125 +1,81 @@
-#include <furi.h> // For FURI_LOG_D
-#include <datetime/datetime.h> // For RTC handling
-
+#include <furi.h>
 #include "state_management.h"
 #include "constants.h"
-#include "feature_management.h"
-#include "settings_management.h"
+#include "game_model.h"
+#include "game_logic.h"
+#include "states.h"
+#include "clock.h"
 #include "save_restore.h"
-#include "game_structs.h"
 
-static uint32_t get_current_timestamp() {
-    DateTime current_time;
-    furi_hal_rtc_get_datetime(&current_time);
-    return datetime_datetime_to_timestamp(&current_time);
-}
-
-static void fast_forward_state(struct GameState *game_state) {
-    MASK_VIBRO_SOUND(game_state)
-    struct GameEvents events = { 0 };
-    generate_new_random_events(game_state, &events);
-    process_events(game_state, events);
-    UNMASK_VIBRO_SOUND(game_state)
-}
-
-static void init_persistent_state_object(struct GameState *game_state) {
-    // Init the struct with default values
-    uint32_t current_timestamp = get_current_timestamp();
-    game_state->persistent.stage = EGG;
-
-    // Init every individual feature
-    init_xp(game_state, current_timestamp);
-    init_hu(game_state, current_timestamp);
-    init_hp(game_state, current_timestamp);
-}
-
-void init_state(struct GameState *game_state) {
-    // Try to load the state from the storage
-    if (!load_state_from_file(&game_state->persistent)) {
-        init_persistent_state_object(game_state);
-    } else {
-        // State loaded from file. Actualize it up to
-        // the current timestamp.
-        FURI_LOG_D(LOG_TAG, "Fast forwarding persisted state to current time");
-        fast_forward_state(game_state);
+GameEventFlags init_state(struct GameState *gs) {
+    if(!load_state_from_file(&gs->persistent)) {
+        game_state_init(gs, game_now());
+        return EVT_NONE;
     }
-    game_state->next_animation_index = 0;
+    // Loaded: transient fields are not persisted, initialise them, then
+    // fast-forward the simulation to now.
+    gs->next_animation_index = 0;
+    gs->display_state = DISP_IDLE;
+    return advance_state(gs, game_now());
 }
 
-void persist_state(struct GameState *game_state) {
-    bool result = save_state_to_file(&game_state->persistent);
-    if (!result) {
+void persist_state(struct GameState *gs) {
+    if(!save_state_to_file(&gs->persistent)) {
         furi_crash("Unable to save state to storage");
     }
 }
 
-void reset_state(struct GameState *game_state) {
-    init_persistent_state_object(game_state);
+void reset_state(struct GameState *gs) {
+    game_state_init(gs, game_now());
 }
 
-static void _generate_new_random_event(uint32_t timestamp, struct GameState *game_state, struct GameEvents *game_events) {
-    if (game_state->persistent.stage == DEAD) {
-        FURI_LOG_D(LOG_TAG, "Received generate request, but stage is DEAD");
-        // Can't do much
-        return;
+GameEventFlags tick_state(struct GameState *gs) {
+    return advance_state(gs, game_now());
+}
+
+GameEventFlags do_action(struct GameState *gs, enum ThreadsMessageType type) {
+    uint32_t now = game_now();
+    switch(type) {
+        case PROCESS_FEED:     return do_feed(gs, now);
+        case PROCESS_PLAY:     return do_play(gs, now);
+        case PROCESS_CLEAN:    return do_clean(gs, now);
+        case PROCESS_MEDICINE: return do_medicine(gs, now);
+        case PROCESS_SCOLD:    return do_scold(gs, now);
+        case TOGGLE_LIGHTS:    return do_lights(gs, now);
+        default:               return EVT_NONE;
     }
-    // Check every individual feature
-    check_xp(game_state, timestamp, game_events);
-    check_hu(game_state, timestamp, game_events);
-    check_hp(game_state, timestamp, game_events);
 }
 
-void generate_new_random_events(struct GameState *game_state, struct GameEvents *game_events) {
-    uint32_t current_timestamp = get_current_timestamp();
-    _generate_new_random_event(current_timestamp, game_state, game_events);
-    return;
+bool state_is_night_now(void) {
+    return is_night(game_now());
 }
 
-bool process_events(struct GameState *game_state, struct GameEvents game_events) {
-    bool new_events = false;
+static const char *care_word(int32_t care) {
+    if(care >= 80) return "Thriving";
+    if(care >= 60) return "Content";
+    if(care >= 40) return "OK";
+    if(care >= 20) return "Poor";
+    return "Neglected";
+}
 
-    // Process every individual feature
-    new_events |= apply_xp(game_state, game_events);
-    new_events |= apply_hu(game_state, game_events);
-    new_events |= apply_hp(game_state, game_events);
-
-    if (new_events) {
-        correct_state(game_state);
+void get_state_str(const struct GameState *gs, char *str, size_t size) {
+    const struct PersistentGameState *p = &gs->persistent;
+    uint32_t now = game_now();
+    uint32_t age_days = (now > p->birth_timestamp) ? (now - p->birth_timestamp) / 86400u : 0;
+    if(p->stage == ADULT && p->alignment != ALIGN_NONE) {
+        snprintf(str, size,
+                 "%s %s\nAge: %lud\nDiscipline: %lu\nCare: %s",
+                 ALIGNMENT_STRING[p->alignment],
+                 LIFE_STAGE_STRING[p->stage],
+                 (unsigned long)age_days,
+                 (unsigned long)p->discipline,
+                 care_word(p->care_score));
+    } else {
+        snprintf(str, size,
+                 "Stage: %s\nAge: %lud\nDiscipline: %lu\nCare: %s",
+                 LIFE_STAGE_STRING[p->stage],
+                 (unsigned long)age_days,
+                 (unsigned long)p->discipline,
+                 care_word(p->care_score));
     }
-
-    return new_events;
-}
-
-void get_state_str(const struct GameState *game_state, char *str, size_t size) {
-    size_t copied = 0;
-    copied = snprintf(str, size,
-                      "Stage: %s\n",
-                      LIFE_STAGE_STRING[game_state->persistent.stage]);
-
-    // Append every individual feature
-    str += copied;
-    size -= copied;
-    copied = get_text_xp(game_state, str, size);
-    str += copied;
-    size -= copied;
-    copied = snprintf(str, size, "\n");
-    str += copied;
-    size -= copied;
-    copied = get_text_hu(game_state, str, size);
-    str += copied;
-    size -= copied;
-    copied = snprintf(str, size, "\n");
-    str += copied;
-    size -= copied;
-    copied = get_text_hp(game_state, str, size);
-}
-
-void give_candy(struct GameState *game_state, struct GameEvents *game_events) {
-    uint32_t current_timestamp = get_current_timestamp();
-    generate_hu(game_state, current_timestamp, game_events);
-}
-
-void give_pill(struct GameState *game_state, struct GameEvents *game_events) {
-    uint32_t current_timestamp = get_current_timestamp();
-    generate_hp(game_state, current_timestamp, game_events);
 }

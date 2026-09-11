@@ -4,6 +4,7 @@
 #include <gui/gui.h>
 #include <gui/scene_manager.h>
 #include <gui/view_dispatcher.h>
+#include <gui/view.h>
 
 #include <gui/modules/loading.h>
 #include "gui/custom_modules/button_panel.h" // Custom version of this module
@@ -25,7 +26,7 @@ struct ApplicationContext {
     ViewDispatcher *view_dispatcher;
     /* Modules for GUI */
     Loading *loading_module;
-    ButtonPanel *button_module;
+    View *pet_view; // custom main view
     VariableItemList *variable_item_list_module;
     DialogEx *dialog_ex_module;
     TextBox *text_box_module;

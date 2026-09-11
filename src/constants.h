@@ -14,13 +14,13 @@
 
 /* Strings */
 #define LOG_TAG "Dragotchi"
-static const char ABOUT_TEXT[] = "Matagotchi\n"
-                                 "A Tamagotchi like game\n"
-                                 "by MrModd\n"
+static const char ABOUT_TEXT[] = "Dragotchi\n"
+                                 "Raise a dragon\n"
+                                 "White = well raised,\n"
+                                 "black = neglected.\n"
                                  "\n"
-                                 "This application is released\n"
-                                 "under the GPLv3 license\n"
-                                 "For more info visit\n"
+                                 "GPLv3. Fork of MrModd's\n"
+                                 "Matagotchi. Thanks MrModd!\n"
                                  "github.com/MrModd/Matagotchi";
 
 static const char LIFE_STAGE_STRING[][10] = {"Egg",

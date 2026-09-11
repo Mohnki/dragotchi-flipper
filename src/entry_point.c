@@ -14,12 +14,14 @@
 #include <core/message_queue.h>
 
 #include <dolphin/dolphin.h>
+#include <furi_hal_random.h>
 
 #include "flipper_structs.h"
 #include "game_structs.h"
 #include "gui/scenes/scenes.h"
 #include "gui/view_dispatcher.h"
 #include "threads.h"
+#include "gui/pet_view.h"
 
 /******************** Initialisation & startup *****************************/
 
@@ -29,7 +31,7 @@ static void init_gui(struct ApplicationContext *context) {
 
     // Init modules
     context->loading_module = loading_alloc(); // Loading screen while reading persisted status
-    context->button_module = button_panel_alloc(); // Home screen
+    context->pet_view = pet_view_alloc(context); // Home screen (custom view)
     context->variable_item_list_module = variable_item_list_alloc(); // Settings page
     context->dialog_ex_module = dialog_ex_alloc(); // Reset screen
     context->text_box_module = text_box_alloc(); // About screen
@@ -50,8 +52,7 @@ static void init_gui(struct ApplicationContext *context) {
                              loading_get_view(context->loading_module));
     view_dispatcher_add_view(context->view_dispatcher,
                              scene_main,
-                             button_panel_get_view(context->button_module));
-    view_set_orientation(button_panel_get_view(context->button_module), ViewOrientationHorizontal);
+                             context->pet_view);
     view_dispatcher_add_view(context->view_dispatcher,
                              scene_settings,
                              variable_item_list_get_view(context->variable_item_list_module));
@@ -64,12 +65,6 @@ static void init_gui(struct ApplicationContext *context) {
     view_dispatcher_add_view(context->view_dispatcher,
                              scene_status,
                              popup_get_view(context->popup_module));
-    view_dispatcher_add_view(context->view_dispatcher,
-                             scene_candy,
-                             popup_get_view(context->popup_module));
-    view_dispatcher_add_view(context->view_dispatcher,
-                             scene_pill,
-                             popup_get_view(context->popup_module));
 
     // Init GUI and attach the view_dispatcher to it
     context->gui = furi_record_open(RECORD_GUI);
@@ -80,8 +75,6 @@ static void init_gui(struct ApplicationContext *context) {
 
 static void free_gui(struct ApplicationContext *context) {
     /* Free the view_dispatcher */
-    view_dispatcher_remove_view(context->view_dispatcher, scene_pill);
-    view_dispatcher_remove_view(context->view_dispatcher, scene_candy);
     view_dispatcher_remove_view(context->view_dispatcher, scene_status);
     view_dispatcher_remove_view(context->view_dispatcher, scene_about);
     view_dispatcher_remove_view(context->view_dispatcher, scene_reset);
@@ -95,7 +88,7 @@ static void free_gui(struct ApplicationContext *context) {
     text_box_free(context->text_box_module);
     dialog_ex_free(context->dialog_ex_module);
     variable_item_list_free(context->variable_item_list_module);
-    button_panel_free(context->button_module);
+    pet_view_free(context->pet_view);
     loading_free(context->loading_module);
 
     /* Free the scene_manager */
