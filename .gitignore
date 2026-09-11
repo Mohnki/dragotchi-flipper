@@ -1,0 +1,10 @@
+# Flipper build tooling & outputs
+.ufbt/
+dist/
+build/
+*.fap
+# Host test build
+test/host/build/
+# Python
+__pycache__/
+*.pyc
