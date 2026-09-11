@@ -121,7 +121,7 @@ Stages advance by **age** (elapsed time since hatching), not by raw XP:
 | **Wyrmling**  | ~day 1  | |
 | **Drake** (teen) | ~day 2.5 | |
 | **Adult**     | ~day 4.5 | **branches by care** (see below) |
-| **Dead**      | ~day 10–14 with good care; earlier if neglected | |
+| **Dead**      | old-age death is care-gated — see §5 Death (immortal while care ≥ 90) | |
 
 ### Care-driven branch (at Drake → Adult)
 
@@ -138,8 +138,17 @@ light/dark drake variant. Not required for v1.)*
 ### Death
 
 - **Health = 0** → dead (starvation or ignored illness), at any stage.
-- **Old age**: past the lifespan for the current alignment (well-cared white
-  dragons live longest; neglected black dragons die soonest).
+- **Old age** is *care-gated, not a fixed clock.* Once adult, an old-age check
+  runs periodically but can only take the dragon if its **sustained care is
+  below an excellence bar**:
+  - **Care score ≥ 90 (very well looked after) → immortal**: the old-age check
+    never fires. Keep it thriving and it lives forever.
+  - **Below 90**: old-age mortality applies on a curve — the higher the care,
+    the longer it lives; a neglected black dragon dies soonest. Rough guide:
+    good care ~day 10–14, poor care sooner.
+  - Immortality is *revocable*: let care slip below 90 and the old-age clock
+    resumes; bring care back up and the dragon is safe again. (It can still die
+    of Health = 0 at any time — immortality is only against *old age*.)
 
 ---
 
@@ -151,7 +160,8 @@ adjustable; a `DEBUG` build compresses to seconds for testing):
 - Hunger empties over ~3–4 h; Happiness over ~6 h.
 - Poops 2–3×/day; may fall ill a few times over a life.
 - Sleeps nightly per RTC (default 22:00–08:00).
-- Adult by ~day 4–5; natural death ~day 10–14 with good care.
+- Adult by ~day 4–5. Old-age death is care-gated (see §5): ~day 10–14 on good
+  care, sooner if neglected, and **never** while care stays ≥ 90.
 
 ---
 
@@ -216,6 +226,8 @@ Produced as 1-bit PNGs; the `fbt`/`ufbt` asset pipeline compiles them into the a
   `furi` stub, with a seedable RNG — and test the deterministic behaviour:
   - evolution stage timing and the care→alignment branch thresholds,
   - care-score adjustments for each good/bad event,
+  - old-age mortality: death on the expected curve below the excellence bar,
+    and **no** old-age death while care ≥ 90 (immortality, and its revocation),
   - offline fast-forward math (elapsed time → correct number of hunger/poop/
     illness/age events),
   - save/restore round-trip and version handling.
@@ -237,4 +249,6 @@ will be a clearly-labelled commit.
 - Full **play mini-game** (guessing game).
 - Multiple pet **species** (beyond the dragon line).
 - **Weight** stat and feeding/exercise economy.
+- **Ways to show off the immortality achievement** — e.g. a crown/elder sprite,
+  a badge, or a records screen tracking longest-lived dragon.
 - Any true background/closed-app execution (not possible on stock firmware).
