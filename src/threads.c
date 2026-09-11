@@ -34,8 +34,12 @@ int32_t secondary_thread(void *ctx) {
     FURI_LOG_D(LOG_TAG, "Secondary thread started");
 
     init_settings(context->game_state);
-    init_state(context->game_state); // offline flags discarded for now (summary: Task 4.4)
+    GameEventFlags offline = init_state(context->game_state);
     switch_to_main_scene(context);
+    // "While you were away": if the pet needs urgent attention now, call out.
+    if(offline & (EVT_DIED | EVT_SICK | EVT_STARVING)) {
+        play_for_flags(context->game_state, offline);
+    }
 
     struct ThreadsMessage message;
     while(true) {
