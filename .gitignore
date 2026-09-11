@@ -8,3 +8,4 @@ test/host/build/
 # Python
 __pycache__/
 *.pyc
+.vscode/
