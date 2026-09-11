@@ -96,6 +96,7 @@ struct PersistentGameState {
     int32_t care_score; // 0..100
     uint32_t discipline; // 0..100
     uint8_t attention_call; // 1 = calling with no real need
+    uint32_t last_attention_update; // cursor for attention-call checks
 };
 
 struct PersistentSettings {
