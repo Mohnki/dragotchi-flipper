@@ -23,6 +23,18 @@ GameEventFlags check_evolution(struct GameState *gs, uint32_t now) {
     while(p->stage < ADULT && age >= enter_age((enum LifeStage)(p->stage + 1))) {
         p->stage++;
         p->stage_entered_timestamp = p->birth_timestamp + enter_age((enum LifeStage)p->stage);
+        if(p->stage == HATCHLING) {
+            // Needs only start ticking once it hatches; resync all cursors so
+            // the egg period does not retro-decay the newborn.
+            uint32_t t = p->stage_entered_timestamp;
+            p->last_hunger_update = t;
+            p->last_happiness_update = t;
+            p->last_health_update = t;
+            p->last_poop_update = t;
+            p->last_sick_update = t;
+            p->last_sleep_update = t;
+            p->last_attention_update = t;
+        }
         if(p->stage == ADULT) {
             p->alignment = (uint8_t)care_band(p->care_score);
         }
