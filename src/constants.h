@@ -12,7 +12,7 @@
 #define ANIMATION_TICKS_DURATION 1U
 
 /* Strings */
-#define LOG_TAG "Matagotchi"
+#define LOG_TAG "Dragotchi"
 static const char ABOUT_TEXT[] = "Matagotchi\n"
                                  "A Tamagotchi like game\n"
                                  "by MrModd\n"
@@ -30,8 +30,8 @@ static const char LIFE_STAGE_STRING[][6] = {"Egg",
                                             "Dead"};
 
 /* Game state file info */
-#define GAME_STATE_STORAGE_STATE_FILENAME "matagotchi.save"
-#define GAME_STATE_STORAGE_SETTINGS_FILENAME "matagotchi.settings"
+#define GAME_STATE_STORAGE_STATE_FILENAME "dragotchi.save"
+#define GAME_STATE_STORAGE_SETTINGS_FILENAME "dragotchi.settings"
 #define GAME_STATE_STORAGE_STATE_PATH APP_DATA_PATH(GAME_STATE_STORAGE_STATE_FILENAME)
 #define GAME_STATE_STORAGE_SETTINGS_PATH APP_DATA_PATH(GAME_STATE_STORAGE_SETTINGS_FILENAME)
 #define GAME_STATE_HEADER_MAGIC 0xFE
@@ -42,7 +42,7 @@ static const char LIFE_STAGE_STRING[][6] = {"Egg",
 /*
  * DEBUG PARAMETERS (fast evolution)
  * To compile with fbt use the following command:
- * ./fbt --extra-define=DEBUG launch APPSRC=matagotchi
+ * ./fbt --extra-define=DEBUG launch APPSRC=dragotchi
  */
 static const uint32_t MAX_XP_PER_STAGE[] = {1,    // EGG
                                             10,   // BABY

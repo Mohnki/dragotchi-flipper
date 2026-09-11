@@ -4,7 +4,7 @@
 
 #include "main_scene.h"
 #include "scenes.h"
-#include "matagotchi_icons.h"
+#include "dragotchi_icons.h"
 #include "../game_decoder.h"
 #include "../../flipper_structs.h"
 #include "../../constants.h"

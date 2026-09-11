@@ -145,7 +145,7 @@ static void context_free(struct ApplicationContext *context) {
 }
 
 /* The application's entry point. Execution starts from here. */
-int32_t matagotchi_app(void* p) {
+int32_t dragotchi_app(void* p) {
     UNUSED(p);
 
     /* Allocate all of the necessary structures */

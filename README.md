@@ -1,56 +1,34 @@
-[![FAP Build](https://github.com/MrModd/Matagotchi/actions/workflows/build.yml/badge.svg)](https://github.com/MrModd/Matagotchi/actions/workflows/build.yml)
+# Dragotchi
 
-# Matagotchi
-Tamagotchi(R) like game for Flipper Zero
+A dragon-raising virtual pet for the [Flipper Zero](https://flipperzero.one/).
+Raise an egg into a dragon — feed it, play with it, keep it clean and healthy,
+discipline it, and let it sleep. **How well you care for it decides who it
+becomes:** a radiant **white dragon** if you raise it well, a **grey** dragon
+for middling care, or a **black dragon** if you neglect it. Care for an adult
+impeccably and it can live *forever*.
 
-![Home](images/home_screen.png)
-![About](images/about_screen.png)
+## Status
 
-## Supported features
-### Life stages
-The pet grows from an egg to an adult and then dies of old age.
+Work in progress (v0.1). Built for Flipper Zero firmware **1.4.3** (API 87.1).
 
-The stages are ![Egg](assets/egg_00_60x60.png) -> ![Baby](assets/baby_00_60x60.png) -> ![Child](assets/child_00_60x60.png) -> ![Teen](assets/teen_00_60x60.png) -> ![Adult](assets/adult_00_60x60.png) -> ![Dead](assets/dead_00_60x60.png)
+## Credits & license
 
-What? Who said that a cat can't come from an egg? I must have missed some biology lessons.
+Dragotchi is a fork of **[MrModd's Matagotchi](https://github.com/MrModd/Matagotchi)**
+and is released, like the original, under the **GPLv3**. All of MrModd's
+original copyright and the `LICENSE` file are retained. Thank you to MrModd for
+the excellent foundation (two-thread engine, offline state fast-forward, and
+save system) that Dragotchi builds on.
 
-### Save game
-The pet continues living while the game is not running.
-The game is saved when exiting and restored when reopening
-the application.
-The time progress even when the game is not running.
-Don't forget to feed your pet!
+## Building
 
-![Reset](images/reset_screen.png)
+Requires [`ufbt`](https://github.com/flipperdevices/flipperzero-ufbt) pinned to
+the release SDK matching your firmware:
 
-If you want to start the game again, you can reset the
-state from the settings.
+```sh
+pip install ufbt
+ufbt update --channel release      # must resolve to API 87.1 for fw 1.4.3
+ufbt                               # builds dist/dragotchi.fap
+ufbt launch                        # build + install + run on a connected Flipper
+```
 
-### Experience
-![Stats](images/stats_screen.png)
-
-The pet periodically gains experience (XP). Once he reaches
-the maximum experience for the current life stage,
-he passes to the next stage.
-
-### Hunger
-![Candy](images/candy_screen.png)
-
-You have to feed the pet or he will starve.
-You can give him candies.
-
-### Health
-![Pill](images/pill_screen.png)
-
-When the pet is hungry he starts losing health.
-You need to cure him with a pill.
-He can also get sick.
-
-# Disclamer
-Tamagotchi is a trademark of Bandai Co., Ltd.. We are not affiliated with,
-endorsed by, or sponsored by Bandai Co., Ltd., and the use of their trademark
-is solely for descriptive purposes within this application.
-
-# TODO
-* Add animations for stage up
-* Add happyness feature
+The compiled app installs to `/ext/apps/Games/dragotchi.fap`.

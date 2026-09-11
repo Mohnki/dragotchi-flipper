@@ -1,7 +1,7 @@
 #include <furi.h>
 
 #include "game_decoder.h"
-#include "matagotchi_icons.h"
+#include "dragotchi_icons.h"
 
 /* Index all images in all life stages */
 static const Icon *life_stages[LIFE_STAGES_NUM][6] = {
