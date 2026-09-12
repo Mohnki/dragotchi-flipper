@@ -1,3 +1,10 @@
+## 0.3.1 - Real airwaves
+ - Hunting now reads the REAL sub-GHz airwaves: Forage sweeps 315/433/868/915 MHz,
+   measures RSSI (receive-only), and busier surroundings yield better/rarer
+   catches. Where you physically are now changes your luck.
+ - Fixes the earlier radio crash: ignore subghz begin()'s false return and give
+   the logic thread a 4KB stack (a 1KB stack overflowed during the sweep).
+
 ## 0.3.0 - Expeditions
  - Send the dragon on a timed offline expedition: Short 30m / Long 2h / Epic 8h
    (Menu -> Expedition). Needs pause while it's away (it can't starve at home).

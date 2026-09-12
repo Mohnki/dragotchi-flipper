@@ -12,5 +12,5 @@ App(
     fap_description="Raise a dragon",
     fap_author="MrModd (original), fork by willem",
     fap_weburl="https://github.com/MrModd/Matagotchi",
-    fap_version="0.3.0"
+    fap_version="0.3.1"
 )

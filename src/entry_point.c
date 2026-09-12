@@ -138,7 +138,7 @@ static struct ApplicationContext * context_alloc() {
 
     // Create a secondary thread
     context->secondary_thread = furi_thread_alloc();
-    furi_thread_set_stack_size(context->secondary_thread, 1024U);
+    furi_thread_set_stack_size(context->secondary_thread, 4096U);
     furi_thread_set_context(context->secondary_thread, context);
     furi_thread_set_callback(context->secondary_thread, secondary_thread);
 
