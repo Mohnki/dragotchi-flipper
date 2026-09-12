@@ -1,3 +1,12 @@
+## 0.2.0 - Hunt
+ - Forage: a one-tap hunt yields a surprise catch - prey (feeds it), treasure
+   (builds a hoard), or a rare egg (hatchery) - with a cooldown + catch banner.
+ - Hoard rank/title and egg counts on the Stats screen.
+ - Legacy: when your dragon dies, hatch an heir egg to continue with a care
+   head-start (hoard persists across lineage).
+ - Note: catch luck currently uses a safe internal source; true sub-GHz
+   "airwave" sensing is a separate upcoming spike.
+
 ## 0.1.2
  - Heart meters: Hunger / Joy / Health now show as rows of 4 hearts.
  - Dedicated eating (open-mouth chomp) and sleeping (eyes-closed + Zzz) sprites,
