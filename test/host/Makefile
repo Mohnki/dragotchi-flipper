@@ -1,7 +1,7 @@
 CC ?= gcc
 CFLAGS ?= -std=c11 -Wall -Wextra -O0 -g -I. -Istub -I../../src
 SRCDIR = ../../src
-LOGIC = $(SRCDIR)/random_generator.c $(SRCDIR)/care.c $(SRCDIR)/game_model.c $(SRCDIR)/needs.c $(SRCDIR)/states.c $(SRCDIR)/discipline.c $(SRCDIR)/evolution.c $(SRCDIR)/game_logic.c
+LOGIC = $(SRCDIR)/random_generator.c $(SRCDIR)/care.c $(SRCDIR)/game_model.c $(SRCDIR)/needs.c $(SRCDIR)/states.c $(SRCDIR)/discipline.c $(SRCDIR)/evolution.c $(SRCDIR)/game_logic.c $(SRCDIR)/hunt.c
 STUBS = furi_stub.c
 TESTS = test_runner.c test_rng.c test_model.c test_needs.c test_states.c test_discipline.c test_evolution.c test_integration.c test_save.c test_overnight.c test_hunt.c
 BUILD = build
