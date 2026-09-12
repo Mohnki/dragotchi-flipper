@@ -13,6 +13,7 @@ int main(void) {
     run_overnight_tests();
     run_hunt_tests();
     run_hunt_logic_tests();
+    run_economy_tests();
     printf(g_fails ? "FAILED (%d)\n" : "ALL OK\n", g_fails);
     return g_fails ? 1 : 0;
 }

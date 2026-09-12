@@ -124,4 +124,12 @@
 #define TREASURE_MED   12
 #define TREASURE_LARGE 25
 
+/* ---- v0.2 Economy ---- */
+#define RANK2_MIN 50
+#define RANK3_MIN 200
+#define RANK4_MIN 600
+#define RANK5_MIN 1500
+#define HEIR_RARE_CARE 65
+#define HEIR_COMMON_CARE 55
+
 #endif

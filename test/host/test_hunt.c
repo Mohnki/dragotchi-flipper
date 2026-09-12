@@ -37,3 +37,22 @@ void run_hunt_logic_tests(void) {
     apply_catch(&g, (struct Catch){CATCH_EGG, 1, 0, 1}, 700);
     CHECK(g.persistent.eggs_rare == 1);
 }
+
+#include "economy.h"
+#include <string.h>
+void run_economy_tests(void) {
+    CHECK(strcmp(hoard_rank(0), "Nest Scrounger") == 0);
+    CHECK(strcmp(hoard_rank(RANK4_MIN), "Wyrm of Wealth") == 0);
+    CHECK(strcmp(hoard_rank(999999), "Dragon Sovereign") == 0);
+
+    struct GameState h = {0}; game_state_init(&h, 0);
+    CHECK(has_heir_egg(&h) == false);
+    h.persistent.eggs_rare = 1; CHECK(has_heir_egg(&h) == true);
+    h.persistent.stage = DEAD; h.persistent.hoard = 123;
+    hatch_heir(&h, 5000);
+    CHECK(h.persistent.stage == EGG);
+    CHECK(h.persistent.eggs_rare == 0);
+    CHECK(h.persistent.care_score == HEIR_RARE_CARE);
+    CHECK(h.persistent.hoard == 123);
+    CHECK(h.persistent.birth_timestamp == 5000);
+}
