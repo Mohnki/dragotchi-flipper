@@ -3,11 +3,12 @@
 #include <gui/view.h>
 #include "../game_structs.h"
 
-#define PET_ACTION_COUNT 6
+#define PET_ACTION_COUNT 7
 /* Custom events sent from the pet view's input handler. Action indices 0..5
  * map to ThreadsMessageType PROCESS_FEED + index. */
 #define PET_EVT_STATS 100u
 #define PET_EVT_SETTINGS 101u
+#define PET_EVT_HATCH 102u
 
 /* @context must be the ApplicationContext (used by the input callback). */
 View *pet_view_alloc(void *context);

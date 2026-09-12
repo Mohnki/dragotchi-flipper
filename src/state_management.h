@@ -14,6 +14,10 @@ GameEventFlags tick_state(struct GameState *);
 /* Dispatch a player action (message type) to the game logic at the current
  * time. Returns event flags. */
 GameEventFlags do_action(struct GameState *, enum ThreadsMessageType);
+/* Hunt: forage the airwaves for a catch (respects cooldown). */
+GameEventFlags do_forage(struct GameState *);
+/* Legacy: hatch an heir egg into a fresh dragon. */
+void do_hatch_heir(struct GameState *);
 
 /* Human-readable status text for the Stats screen. */
 void get_state_str(const struct GameState *, char *, size_t);

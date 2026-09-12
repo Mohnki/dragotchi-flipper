@@ -13,7 +13,9 @@ enum ThreadsMessageType {
     PROCESS_CLEAN,
     PROCESS_MEDICINE,
     PROCESS_SCOLD,
-    TOGGLE_LIGHTS
+    TOGGLE_LIGHTS,
+    PROCESS_FORAGE,
+    PROCESS_HATCH_HEIR
 };
 
 struct ThreadsMessage {
@@ -50,6 +52,15 @@ enum DisplayState {
     DISP_DEAD
 };
 
+enum CatchCategory { CATCH_PREY, CATCH_TREASURE, CATCH_EGG };
+enum CatchTier { TIER_SMALL, TIER_MED, TIER_LARGE };
+struct Catch {
+    uint8_t category; // enum CatchCategory
+    uint8_t tier;     // enum CatchTier (prey/treasure) or rarity (egg: 0 common,1 rare)
+    uint16_t value;   // food or hoard points
+    uint8_t band;     // 0..HUNT_BANDS-1 (flavour)
+};
+
 /* Event flags returned by advance/action functions so the device layer can
  * decide sound/vibration and build the "while you were away" summary. */
 typedef uint32_t GameEventFlags;
@@ -64,6 +75,7 @@ typedef uint32_t GameEventFlags;
 #define EVT_FED (1u << 7)
 #define EVT_PLAYED (1u << 8)
 #define EVT_CLEANED (1u << 9)
+#define EVT_CAUGHT (1u << 10)
 
 /* Persisted game state (saved to storage) */
 struct PersistentGameState {
@@ -98,6 +110,11 @@ struct PersistentGameState {
     uint8_t attention_call; // 1 = calling with no real need
     uint32_t last_attention_update; // cursor for attention-call checks
     uint32_t last_oldage_update; // cursor for old-age death checks (adult)
+    // --- v0.2 Hunt ---
+    uint32_t hoard;             // treasure points (score)
+    uint16_t eggs_common;       // hatchery
+    uint16_t eggs_rare;
+    uint32_t last_forage_time;  // forage cooldown cursor
 };
 
 struct PersistentSettings {
@@ -111,6 +128,9 @@ struct GameState {
     // Transient
     uint32_t next_animation_index;
     uint8_t display_state; // enum DisplayState
+    struct Catch last_catch;   // for the catch reveal (transient)
+    uint8_t reveal_ticks;      // >0 = show reveal banner (transient)
+    char reveal_text[24];      // banner text (transient)
 };
 
 #endif

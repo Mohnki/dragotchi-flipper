@@ -106,4 +106,30 @@
 #define DISCIPLINE_SCOLD_GAIN 8
 #define DISCIPLINE_SPOIL_LOSS 5
 
+/* ---- v0.2 Hunt ---- */
+#define HUNT_BANDS 4               /* 315, 433, 868, 915 MHz (indices 0..3) */
+#ifdef DEBUG
+#define FORAGE_COOLDOWN 5
+#else
+#define FORAGE_COOLDOWN 180        /* 3 min */
+#endif
+#define PREY_PCT_LO 70
+#define PREY_PCT_HI 45
+#define TREASURE_PCT_LO 25
+#define TREASURE_PCT_HI 40
+#define PREY_FOOD_SMALL 15
+#define PREY_FOOD_MED   30
+#define PREY_FOOD_LARGE 45
+#define TREASURE_SMALL 5
+#define TREASURE_MED   12
+#define TREASURE_LARGE 25
+
+/* ---- v0.2 Economy ---- */
+#define RANK2_MIN 50
+#define RANK3_MIN 200
+#define RANK4_MIN 600
+#define RANK5_MIN 1500
+#define HEIR_RARE_CARE 65
+#define HEIR_COMMON_CARE 55
+
 #endif

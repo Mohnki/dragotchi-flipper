@@ -56,6 +56,30 @@ int32_t secondary_thread(void *ctx) {
                     context->game_state->next_animation_index = 0;
                     go_back_to_main_scene(context);
                     break;
+                case PROCESS_FORAGE: {
+                    GameEventFlags f = do_forage(context->game_state);
+                    if(f & EVT_CAUGHT) {
+                        struct GameState *gs = context->game_state;
+                        switch(gs->last_catch.category) {
+                            case CATCH_PREY:     play_action(gs); vibrate_short(gs); break;
+                            case CATCH_TREASURE: play_level_up(gs); vibrate_short(gs); break;
+                            default:             play_level_up(gs); vibrate_long(gs); break; // egg
+                        }
+                    } else {
+                        vibrate_short(context->game_state); // on cooldown
+                    }
+                    context->game_state->next_animation_index = 0;
+                    send_tick_to_scene(context);
+                    break;
+                }
+                case PROCESS_HATCH_HEIR: {
+                    do_hatch_heir(context->game_state);
+                    play_level_up(context->game_state);
+                    vibrate_long(context->game_state);
+                    context->game_state->next_animation_index = 0;
+                    send_tick_to_scene(context);
+                    break;
+                }
                 default: {
                     GameEventFlags f = do_action(context->game_state, message.type);
                     play_for_flags(context->game_state, f);
