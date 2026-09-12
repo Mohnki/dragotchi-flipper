@@ -12,4 +12,5 @@ void run_hunt_tests(void);
 void run_hunt_logic_tests(void);
 void run_economy_tests(void);
 void run_inventory_tests(void);
+void run_expedition_defaults_tests(void);
 void run_hunt_hw_tests(void);

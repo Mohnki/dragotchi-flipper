@@ -132,4 +132,25 @@
 #define HEIR_RARE_CARE 65
 #define HEIR_COMMON_CARE 55
 
+/* ---- v0.3 Expeditions ---- */
+#ifdef DEBUG
+#define EXPED_SEC_PER_MIN 1
+#else
+#define EXPED_SEC_PER_MIN 60
+#endif
+#define EXPED_SHORT_MIN 30
+#define EXPED_LONG_MIN 120
+#define EXPED_EPIC_MIN 480
+#define EXPED_FINDS_SHORT 2
+#define EXPED_FINDS_LONG 5
+#define EXPED_FINDS_EPIC 12
+#define EXPED_ACT_SHORT 40
+#define EXPED_ACT_LONG 60
+#define EXPED_ACT_EPIC 85
+#define EXPED_RISK_SHORT 5
+#define EXPED_RISK_LONG 15
+#define EXPED_RISK_EPIC 30
+#define EXPED_HURT_MIN 5
+#define EXPED_HURT_MAX 20
+
 #endif

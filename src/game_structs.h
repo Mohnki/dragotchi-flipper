@@ -15,11 +15,13 @@ enum ThreadsMessageType {
     PROCESS_SCOLD,
     TOGGLE_LIGHTS,
     PROCESS_FORAGE,
-    PROCESS_HATCH_HEIR
+    PROCESS_HATCH_HEIR,
+    PROCESS_EXPEDITION
 };
 
 struct ThreadsMessage {
     enum ThreadsMessageType type;
+    uint32_t arg; // optional payload (e.g. expedition minutes)
 };
 
 enum LifeStage {
@@ -76,6 +78,7 @@ typedef uint32_t GameEventFlags;
 #define EVT_PLAYED (1u << 8)
 #define EVT_CLEANED (1u << 9)
 #define EVT_CAUGHT (1u << 10)
+#define EVT_EXPED_RETURN (1u << 11)
 
 /* Persisted game state (saved to storage) */
 struct PersistentGameState {
@@ -121,6 +124,10 @@ struct PersistentGameState {
     uint16_t treasure_large;
     uint16_t prey_caught;   // lifetime prey
     uint16_t eggs_caught;   // lifetime eggs (eggs_common/rare are current, decremented on hatch)
+    // Expedition
+    uint8_t on_expedition;
+    uint32_t expedition_start;
+    uint16_t expedition_minutes;
 };
 
 struct PersistentSettings {
@@ -137,6 +144,8 @@ struct GameState {
     struct Catch last_catch;   // for the catch reveal (transient)
     uint8_t reveal_ticks;      // >0 = show reveal banner (transient)
     char reveal_text[24];      // banner text (transient)
+    uint8_t journey_ready;     // transient: expedition returned, show log
+    char journey_log[96];      // transient: journey log text
 };
 
 #endif
