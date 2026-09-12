@@ -129,7 +129,8 @@ struct GameState {
     uint32_t next_animation_index;
     uint8_t display_state; // enum DisplayState
     struct Catch last_catch;   // for the catch reveal (transient)
-    uint8_t forage_on_cooldown; // transient: last forage was blocked
+    uint8_t reveal_ticks;      // >0 = show reveal banner (transient)
+    char reveal_text[24];      // banner text (transient)
 };
 
 #endif

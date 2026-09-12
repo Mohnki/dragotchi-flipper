@@ -1,4 +1,5 @@
 #include <furi.h>
+#include <stdio.h>
 #include "state_management.h"
 #include "constants.h"
 #include "game_model.h"
@@ -33,7 +34,9 @@ void reset_state(struct GameState *gs) {
 }
 
 GameEventFlags tick_state(struct GameState *gs) {
-    return advance_state(gs, game_now());
+    GameEventFlags f = advance_state(gs, game_now());
+    if(gs->reveal_ticks) gs->reveal_ticks--;
+    return f;
 }
 
 GameEventFlags do_action(struct GameState *gs, enum ThreadsMessageType type) {
@@ -51,18 +54,27 @@ GameEventFlags do_action(struct GameState *gs, enum ThreadsMessageType type) {
 
 GameEventFlags do_forage(struct GameState *gs) {
     uint32_t now = game_now();
-    gs->forage_on_cooldown = 0;
-    if(!forage_ready(gs, now)) { gs->forage_on_cooldown = 1; return EVT_NONE; }
+    if(!forage_ready(gs, now)) {
+        snprintf(gs->reveal_text, sizeof(gs->reveal_text), "Still sniffing...");
+        gs->reveal_ticks = 3;
+        return EVT_NONE;
+    }
     uint8_t activity = 0, band = 1;
     hunt_sense(&activity, &band);
     struct Catch c = catch_roll(activity, band);
     apply_catch(gs, c, now);
     gs->last_catch = c;
+    catch_describe(c, gs->reveal_text, sizeof(gs->reveal_text));
+    gs->reveal_ticks = 4;
     return EVT_CAUGHT;
 }
 
 void do_hatch_heir(struct GameState *gs) {
-    if(has_heir_egg(gs)) hatch_heir(gs, game_now());
+    if(has_heir_egg(gs)) {
+        hatch_heir(gs, game_now());
+        snprintf(gs->reveal_text, sizeof(gs->reveal_text), "An heir hatches!");
+        gs->reveal_ticks = 4;
+    }
 }
 
 bool state_is_night_now(void) {
@@ -81,20 +93,15 @@ void get_state_str(const struct GameState *gs, char *str, size_t size) {
     const struct PersistentGameState *p = &gs->persistent;
     uint32_t now = game_now();
     uint32_t age_days = (now > p->birth_timestamp) ? (now - p->birth_timestamp) / 86400u : 0;
-    if(p->stage == ADULT && p->alignment != ALIGN_NONE) {
-        snprintf(str, size,
-                 "%s %s\nAge: %lud\nDiscipline: %lu\nCare: %s",
-                 ALIGNMENT_STRING[p->alignment],
-                 LIFE_STAGE_STRING[p->stage],
-                 (unsigned long)age_days,
-                 (unsigned long)p->discipline,
-                 care_word(p->care_score));
-    } else {
-        snprintf(str, size,
-                 "Stage: %s\nAge: %lud\nDiscipline: %lu\nCare: %s",
-                 LIFE_STAGE_STRING[p->stage],
-                 (unsigned long)age_days,
-                 (unsigned long)p->discipline,
-                 care_word(p->care_score));
-    }
+    const char *stage_line = (p->stage == ADULT && p->alignment != ALIGN_NONE)
+        ? ALIGNMENT_STRING[p->alignment] : "";
+    snprintf(str, size,
+             "%s%s%s  %lud\nCare: %s\n%s\nHoard %lu  Eggs %u/%u",
+             stage_line, stage_line[0] ? " " : "",
+             LIFE_STAGE_STRING[p->stage],
+             (unsigned long)age_days,
+             care_word(p->care_score),
+             hoard_rank(p->hoard),
+             (unsigned long)p->hoard,
+             (unsigned)p->eggs_common, (unsigned)p->eggs_rare);
 }

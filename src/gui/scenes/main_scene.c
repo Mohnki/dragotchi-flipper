@@ -29,8 +29,14 @@ bool scene_main_on_event(void *ctx, SceneManagerEvent event) {
             return true;
         case SceneManagerEventTypeCustom: {
             uint32_t e = event.event;
-            if(e < PET_ACTION_COUNT) {
+            if(e < 6) {
                 struct ThreadsMessage msg = {.type = (enum ThreadsMessageType)(PROCESS_FEED + e)};
+                furi_message_queue_put(context->threads_message_queue, &msg, FuriWaitForever);
+            } else if(e == 6) {
+                struct ThreadsMessage msg = {.type = PROCESS_FORAGE};
+                furi_message_queue_put(context->threads_message_queue, &msg, FuriWaitForever);
+            } else if(e == PET_EVT_HATCH) {
+                struct ThreadsMessage msg = {.type = PROCESS_HATCH_HEIR};
                 furi_message_queue_put(context->threads_message_queue, &msg, FuriWaitForever);
             } else if(e == PET_EVT_STATS) {
                 scene_manager_next_scene(context->scene_manager, scene_status);
