@@ -7,10 +7,12 @@ GameEventFlags advance_hygiene(struct GameState *gs, uint32_t now) {
     struct PersistentGameState *p = &gs->persistent;
     if(p->stage == EGG || p->stage == DEAD) return EVT_NONE;
     if(now <= p->last_poop_update) return EVT_NONE;
-    uint32_t events = (now - p->last_poop_update) / POOP_FREQ;
-    p->last_poop_update += events * POOP_FREQ;
+    uint32_t t0 = p->last_poop_update;
+    uint32_t events = (now - t0) / POOP_FREQ;
+    p->last_poop_update = t0 + events * POOP_FREQ;
     GameEventFlags flags = EVT_NONE;
-    while(events-- > 0 && p->poop < MAX_POOP) {
+    for(uint32_t k = 1; k <= events && p->poop < MAX_POOP; k++) {
+        if(is_night(t0 + k * POOP_FREQ)) continue; // asleep: no pooping
         if(toss_a_coin(POOP_PROB)) {
             if(p->poop == 0) { p->poop_since = now; p->poop_penalized = 0; }
             p->poop++;
@@ -36,14 +38,16 @@ GameEventFlags advance_sickness(struct GameState *gs, uint32_t now) {
     struct PersistentGameState *p = &gs->persistent;
     if(p->stage == EGG || p->stage == DEAD) return EVT_NONE;
     if(now <= p->last_sick_update) return EVT_NONE;
-    uint32_t events = (now - p->last_sick_update) / SICK_CHECK_FREQ;
-    p->last_sick_update += events * SICK_CHECK_FREQ;
+    uint32_t t0 = p->last_sick_update;
+    uint32_t events = (now - t0) / SICK_CHECK_FREQ;
+    p->last_sick_update = t0 + events * SICK_CHECK_FREQ;
     GameEventFlags flags = EVT_NONE;
     if(!p->sick) {
         uint32_t prob = SICK_BASE_PROB
                         + (p->hunger == 0 ? SICK_HUNGRY_BONUS : 0)
                         + (p->poop > 0 ? SICK_DIRTY_BONUS : 0);
-        while(events-- > 0 && !p->sick) {
+        for(uint32_t k = 1; k <= events && !p->sick; k++) {
+            if(is_night(t0 + k * SICK_CHECK_FREQ)) continue; // asleep: no illness onset
             if(toss_a_coin(prob)) {
                 p->sick = 1; p->sick_since = now; p->sick_penalized = 0;
                 flags |= EVT_SICK;
@@ -70,7 +74,9 @@ bool is_night(uint32_t now) {
 }
 
 bool is_asleep(const struct GameState *gs, uint32_t now) {
-    return is_night(now) && gs->persistent.lights_off &&
+    // The pet sleeps through the night on its own. Lights only change whether
+    // that sleep is peaceful (a care reward/penalty), never whether it sleeps.
+    return is_night(now) &&
            gs->persistent.stage != DEAD && gs->persistent.stage != EGG;
 }
 
@@ -93,10 +99,8 @@ GameEventFlags advance_sleep(struct GameState *gs, uint32_t now) {
     uint32_t events = (now - p->last_sleep_update) / HP_CHECK_FREQ;
     p->last_sleep_update += events * HP_CHECK_FREQ;
     if(events > 0 && is_night(now) && !p->lights_off) {
-        // Kept awake at night: one care penalty per episode + bounded happiness loss
+        // Lights left on while it sleeps: a mild care mistake, not harmful.
         care_penalty(p, CARE_SLEEP_DISTURBED);
-        uint32_t hit = events > 10 ? 10 : events;
-        p->happiness = (p->happiness > hit) ? p->happiness - hit : 0;
     }
     return EVT_NONE;
 }

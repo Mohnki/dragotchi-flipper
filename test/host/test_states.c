@@ -53,9 +53,9 @@ void run_states_tests(void) {
     CHECK(is_night(12 * 3600) == false);   // 12:00
     game_state_init(&s, 12 * 3600);
     s.persistent.stage = ADULT;
-    CHECK(is_asleep(&s, 23 * 3600) == false);   // lights on -> awake
-    set_lights(&s, true, 23 * 3600);
-    CHECK(is_asleep(&s, 23 * 3600) == true);    // lights out at night -> asleep
+    CHECK(is_asleep(&s, 23 * 3600) == true);    // sleeps at night regardless of lights
+    CHECK(is_asleep(&s, 12 * 3600) == false);   // awake during the day
+    set_lights(&s, true, 23 * 3600);            // lights out is a care bonus (not required to sleep)
 
     // --- Kept awake at night docks care ---
     rng_seed(5);
