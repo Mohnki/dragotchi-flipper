@@ -13,7 +13,9 @@ enum ThreadsMessageType {
     PROCESS_CLEAN,
     PROCESS_MEDICINE,
     PROCESS_SCOLD,
-    TOGGLE_LIGHTS
+    TOGGLE_LIGHTS,
+    PROCESS_FORAGE,
+    PROCESS_HATCH_HEIR
 };
 
 struct ThreadsMessage {
@@ -73,6 +75,7 @@ typedef uint32_t GameEventFlags;
 #define EVT_FED (1u << 7)
 #define EVT_PLAYED (1u << 8)
 #define EVT_CLEANED (1u << 9)
+#define EVT_CAUGHT (1u << 10)
 
 /* Persisted game state (saved to storage) */
 struct PersistentGameState {
@@ -125,6 +128,8 @@ struct GameState {
     // Transient
     uint32_t next_animation_index;
     uint8_t display_state; // enum DisplayState
+    struct Catch last_catch;   // for the catch reveal (transient)
+    uint8_t forage_on_cooldown; // transient: last forage was blocked
 };
 
 #endif

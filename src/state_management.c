@@ -6,6 +6,9 @@
 #include "states.h"
 #include "clock.h"
 #include "save_restore.h"
+#include "hunt.h"
+#include "hunt_hw.h"
+#include "economy.h"
 
 GameEventFlags init_state(struct GameState *gs) {
     if(!load_state_from_file(&gs->persistent)) {
@@ -44,6 +47,22 @@ GameEventFlags do_action(struct GameState *gs, enum ThreadsMessageType type) {
         case TOGGLE_LIGHTS:    return do_lights(gs, now);
         default:               return EVT_NONE;
     }
+}
+
+GameEventFlags do_forage(struct GameState *gs) {
+    uint32_t now = game_now();
+    gs->forage_on_cooldown = 0;
+    if(!forage_ready(gs, now)) { gs->forage_on_cooldown = 1; return EVT_NONE; }
+    uint8_t activity = 0, band = 1;
+    hunt_sense(&activity, &band);
+    struct Catch c = catch_roll(activity, band);
+    apply_catch(gs, c, now);
+    gs->last_catch = c;
+    return EVT_CAUGHT;
+}
+
+void do_hatch_heir(struct GameState *gs) {
+    if(has_heir_egg(gs)) hatch_heir(gs, game_now());
 }
 
 bool state_is_night_now(void) {
