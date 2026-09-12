@@ -1,3 +1,11 @@
+## 0.3.0 - Expeditions
+ - Send the dragon on a timed offline expedition: Short 30m / Long 2h / Epic 8h
+   (Menu -> Expedition). Needs pause while it's away (it can't starve at home).
+ - Main screen shows an "On Expedition" state with a live countdown; only Stats/
+   Inventory/Settings are reachable until it returns (no early recall).
+ - On return it resolves loot (prey/treasure/eggs, scaled to the trip) and shows
+   a journey log; longer trips give more but risk coming back hurt (never fatal).
+
 ## 0.2.2 - Inventory
  - New Inventory screen (Menu -> Inventory): treasure broken down by tier
    (small/med/large) + total hoard value, eggs by rarity, and lifetime catches
