@@ -56,3 +56,12 @@ void run_economy_tests(void) {
     CHECK(h.persistent.hoard == 123);
     CHECK(h.persistent.birth_timestamp == 5000);
 }
+
+#include "hunt_hw.h"
+extern void hunt_sense_set_for_test(uint8_t, uint8_t);
+void run_hunt_hw_tests(void) {
+    uint8_t a = 0, b = 0;
+    hunt_sense_set_for_test(80, 2);
+    hunt_sense(&a, &b);
+    CHECK(a == 80 && b == 2);
+}

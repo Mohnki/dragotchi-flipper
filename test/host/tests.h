@@ -11,3 +11,4 @@ void run_overnight_tests(void);
 void run_hunt_tests(void);
 void run_hunt_logic_tests(void);
 void run_economy_tests(void);
+void run_hunt_hw_tests(void);
