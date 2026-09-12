@@ -14,6 +14,8 @@ typedef struct {
     uint32_t frame;
     uint8_t reveal_ticks;
     char reveal_text[24];
+    uint8_t on_expedition;
+    uint32_t remaining_sec;
 } PetModel;
 
 static const uint8_t HEART[6] = {0x36, 0x7F, 0x7F, 0x3E, 0x1C, 0x08};
@@ -67,6 +69,20 @@ static void draw_poop(Canvas *c, int x, int y) {
 static void pet_draw_callback(Canvas *canvas, void *model) {
     PetModel *m = model;
     canvas_clear(canvas);
+
+    if(m->on_expedition) {
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 16, 20, "On Expedition");
+        canvas_set_font(canvas, FontSecondary);
+        char rb[32];
+        uint32_t s = m->remaining_sec;
+        snprintf(rb, sizeof(rb), "Returns in %luh %02lum",
+                 (unsigned long)(s / 3600), (unsigned long)((s % 3600) / 60));
+        canvas_draw_str(canvas, 18, 36, rb);
+        canvas_draw_str(canvas, 22, 52, m->frame & 1u ? "adventuring . ." : "adventuring . . .");
+        canvas_draw_line(canvas, 0, 0, 127, 0);
+        return;
+    }
 
     int dx = 0, dy = 0, p = (int)(m->frame & 1u);
     switch(m->display_state) {
@@ -124,7 +140,7 @@ View *pet_view_alloc(void *context) {
 }
 void pet_view_free(View *view) { view_free(view); }
 
-void pet_view_update(View *view, const struct GameState *gs, bool night) {
+void pet_view_update(View *view, const struct GameState *gs, bool night, uint32_t remaining_sec) {
     const struct PersistentGameState *p = &gs->persistent;
     with_view_model(
         view, PetModel * m,
@@ -136,6 +152,7 @@ void pet_view_update(View *view, const struct GameState *gs, bool night) {
             m->reveal_ticks=gs->reveal_ticks;
             for(size_t i=0;i<sizeof(m->reveal_text);i++){ m->reveal_text[i]=gs->reveal_text[i]; if(!gs->reveal_text[i]) break; }
             m->reveal_text[sizeof(m->reveal_text)-1]='\0';
+            m->on_expedition=p->on_expedition; m->remaining_sec=remaining_sec;
         },
         true);
 }

@@ -86,6 +86,10 @@ bool state_is_night_now(void) {
     return is_night(game_now());
 }
 
+uint32_t state_expedition_remaining(const struct GameState *gs) {
+    return expedition_remaining_sec(gs, game_now());
+}
+
 static const char *care_word(int32_t care) {
     if(care >= 80) return "Thriving";
     if(care >= 60) return "Content";
