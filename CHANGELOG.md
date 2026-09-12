@@ -4,11 +4,26 @@
    senses nearby WiFi access-point density. A busy area triggers a "signal
    storm" that boosts catch tiers and egg odds on top of the sub-GHz reading.
  - Auto-sensing: the game listens ~1.5 s for a `DRAGO wifi=N rssi=X` line during
-   each Forage. Heard -> storm boost + a signal-bars/AP-count indicator on the
-   catch reveal. Not heard -> plays exactly as before. The board is pure
-   enrichment; nothing is required to attach it.
+   each Forage. Heard -> storm; not heard -> plays exactly as before. The board
+   is pure enrichment; nothing is required to attach it.
+ - Dedicated animated **Signal Storm screen**: a sweeping radar that pings each
+   nearby network as a blip, live AP count + RSSI, and the catch result. Plain
+   sub-GHz catches keep the small "RF"-tagged bottom banner, so the two hunt
+   modes look completely different.
+ - A storm adds three things beyond better odds: **exclusive "storm eggs"**
+   (a board-only collectible, tracked in Inventory, that can also hatch heirs
+   with the best care head-start), **WiFi-themed flavour** (signal-wisp /
+   cyber-wyrm / data-drake / sky-serpent, "Data cache" treasure), and a
+   **guaranteed floor** (8+ APs never yields a small-prey dud). Catching a storm
+   egg sets off a sparkle celebration on the radar screen.
+ - Forage cooldown shortened to 90 s and now visible: the menu shows
+   "Hunt (Ns)" while cooling down, and a too-soon Hunt says "Hunt ready in Ns".
+ - Version shown in the menu header. Save format bumped (0xD9 -> 0xDA) for the
+   storm-egg counter.
  - ESP firmware lives in `esp32/` (MicroPython + `main.py`), with a flash script
-   and uploader. The ESP32-S2 is WiFi-only (no BLE), so density = WiFi APs.
+   and uploader. The ESP32-S2 is WiFi-only (no BLE), so density = WiFi APs. The
+   reporter transmits the cached scan continuously (~5 Hz) while rescanning on a
+   slow timer, so the Flipper reliably catches a report during its listen window.
 
 ## 0.3.1 - Real airwaves
  - Hunting now reads the REAL sub-GHz airwaves: Forage sweeps 315/433/868/915 MHz,

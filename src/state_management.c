@@ -57,25 +57,39 @@ GameEventFlags do_action(struct GameState *gs, enum ThreadsMessageType type) {
 GameEventFlags do_forage(struct GameState *gs) {
     uint32_t now = game_now();
     if(!forage_ready(gs, now)) {
-        snprintf(gs->reveal_text, sizeof(gs->reveal_text), "Still sniffing...");
+        uint32_t left = forage_cooldown_remaining(gs, now);
+        snprintf(gs->reveal_text, sizeof(gs->reveal_text), "Hunt ready in %lus", (unsigned long)left);
         gs->reveal_ticks = 3;
         return EVT_NONE;
     }
     uint8_t activity = 0, band = 1;
     hunt_sense(&activity, &band);
 
-    /* Optional WiFi devboard: dense airwaves boost the catch ("signal storm"). */
+    /* Optional WiFi devboard: dense airwaves boost the catch, guarantee a floor,
+     * and can drop a board-exclusive "storm egg" ("signal storm"). */
     uint8_t wifi = 0;
     int8_t wrssi = 0;
     gs->board_present = esp_probe(&wifi, &wrssi) ? 1 : 0;
     gs->last_wifi = wifi;
-    if(gs->board_present) activity = signal_storm_activity(activity, wifi);
+    gs->last_rssi = wrssi;
 
-    struct Catch c = catch_roll(activity, band);
-    apply_catch(gs, c, now);
-    gs->last_catch = c;
-    catch_describe(c, gs->reveal_text, sizeof(gs->reveal_text));
-    gs->reveal_ticks = 4;
+    struct Catch c;
+    if(gs->board_present) {
+        c = storm_catch_roll(activity, band, wifi);
+        apply_catch(gs, c, now);
+        gs->last_catch = c;
+        catch_describe_storm(c, gs->reveal_text, sizeof(gs->reveal_text));
+        /* Board-assisted: show the dedicated animated Signal Storm screen
+         * instead of the bottom banner (main scene switches on the next tick). */
+        gs->storm_ready = 1;
+        gs->reveal_ticks = 0;
+    } else {
+        c = catch_roll(activity, band);
+        apply_catch(gs, c, now);
+        gs->last_catch = c;
+        catch_describe(c, gs->reveal_text, sizeof(gs->reveal_text));
+        gs->reveal_ticks = 4;
+    }
     return EVT_CAUGHT;
 }
 

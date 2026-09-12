@@ -111,7 +111,7 @@
 #ifdef DEBUG
 #define FORAGE_COOLDOWN 5
 #else
-#define FORAGE_COOLDOWN 180        /* 3 min */
+#define FORAGE_COOLDOWN 90         /* 90s */
 #endif
 #define PREY_PCT_LO 70
 #define PREY_PCT_HI 45
@@ -133,12 +133,16 @@
 #define STORM_MIN_APS  4    /* >= this many APs is flagged a "signal storm" */
 #define ESP_LINK_BAUD  115200
 #define ESP_PROBE_MS   1500 /* how long to listen for a DRAGO report */
+#define STORM_FLOOR_APS 8   /* >= this many APs: no small-prey duds (guaranteed floor) */
+#define STORM_EGG_BASE  4   /* base %% chance a storm egg replaces a rolled egg */
+#define STORM_EGG_MAX   55  /* cap on storm-egg promotion chance */
 
 /* ---- v0.2 Economy ---- */
 #define RANK2_MIN 50
 #define RANK3_MIN 200
 #define RANK4_MIN 600
 #define RANK5_MIN 1500
+#define HEIR_STORM_CARE 75
 #define HEIR_RARE_CARE 65
 #define HEIR_COMMON_CARE 55
 

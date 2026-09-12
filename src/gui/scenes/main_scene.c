@@ -23,6 +23,11 @@ bool scene_main_on_event(void *ctx, SceneManagerEvent event) {
             view_dispatcher_stop(context->view_dispatcher);
             return true;
         case SceneManagerEventTypeTick:
+            if(context->game_state->storm_ready) {
+                context->game_state->storm_ready = 0;
+                scene_manager_next_scene(context->scene_manager, scene_storm);
+                return true;
+            }
             if(context->game_state->journey_ready) {
                 context->game_state->journey_ready = 0;
                 scene_manager_next_scene(context->scene_manager, scene_journey);

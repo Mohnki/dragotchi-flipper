@@ -128,6 +128,8 @@ struct PersistentGameState {
     uint8_t on_expedition;
     uint32_t expedition_start;
     uint16_t expedition_minutes;
+    // --- v0.4 Signal storm (WiFi devboard) ---
+    uint16_t eggs_storm;   // board-exclusive "storm eggs" (lifetime collectible)
 };
 
 struct PersistentSettings {
@@ -148,6 +150,8 @@ struct GameState {
     char journey_log[96];      // transient: journey log text
     uint8_t board_present;     // transient: WiFi devboard replied on last forage
     uint8_t last_wifi;         // transient: nearby AP count from last board probe
+    int8_t last_rssi;          // transient: strongest AP RSSI from last board probe
+    uint8_t storm_ready;       // transient: show the Signal Storm result screen
 };
 
 #endif

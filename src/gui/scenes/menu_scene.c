@@ -1,4 +1,5 @@
 #include <furi.h>
+#include <stdio.h>
 #include <gui/scene_manager.h>
 #include <gui/view_dispatcher.h>
 #include <gui/modules/submenu.h>
@@ -7,6 +8,8 @@
 #include "scenes.h"
 #include "../../flipper_structs.h"
 #include "../../constants.h"
+#include "../../hunt.h"
+#include "../../clock.h"
 
 enum { MENU_CARE, MENU_HUNT, MENU_EXPEDITION, MENU_INVENTORY, MENU_STATS, MENU_SETTINGS, MENU_HEIR };
 
@@ -19,20 +22,27 @@ void scene_menu_on_enter(void *ctx) {
     struct ApplicationContext *c = ctx;
     Submenu *m = c->menu_module;
     submenu_reset(m);
-    submenu_set_header(m, "Dragotchi");
+    submenu_set_header(m, "Dragotchi v" DRAGOTCHI_VERSION);
     struct PersistentGameState *p = &c->game_state->persistent;
     if(p->on_expedition) {
         submenu_add_item(m, "Inventory", MENU_INVENTORY, menu_cb, c);
         submenu_add_item(m, "Stats", MENU_STATS, menu_cb, c);
         submenu_add_item(m, "Settings", MENU_SETTINGS, menu_cb, c);
     } else if(p->stage == DEAD) {
-        if(p->eggs_common || p->eggs_rare)
+        if(p->eggs_common || p->eggs_rare || p->eggs_storm)
             submenu_add_item(m, "Hatch Heir", MENU_HEIR, menu_cb, c);
         submenu_add_item(m, "Stats", MENU_STATS, menu_cb, c);
         submenu_add_item(m, "Settings", MENU_SETTINGS, menu_cb, c);
     } else {
         submenu_add_item(m, "Care", MENU_CARE, menu_cb, c);
-        submenu_add_item(m, "Hunt", MENU_HUNT, menu_cb, c);
+        static char hunt_label[20];
+        uint32_t cd = forage_cooldown_remaining(c->game_state, game_now());
+        if(cd) {
+            snprintf(hunt_label, sizeof(hunt_label), "Hunt (%lus)", (unsigned long)cd);
+            submenu_add_item(m, hunt_label, MENU_HUNT, menu_cb, c);
+        } else {
+            submenu_add_item(m, "Hunt", MENU_HUNT, menu_cb, c);
+        }
         submenu_add_item(m, "Expedition", MENU_EXPEDITION, menu_cb, c);
         submenu_add_item(m, "Inventory", MENU_INVENTORY, menu_cb, c);
         submenu_add_item(m, "Stats", MENU_STATS, menu_cb, c);

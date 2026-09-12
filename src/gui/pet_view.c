@@ -107,20 +107,13 @@ static void pet_draw_callback(Canvas *canvas, void *model) {
     // bottom strip: reveal banner (if active) else the control hint
     canvas_set_font(canvas, FontSecondary);
     if(m->reveal_ticks) {
+        /* Plain sub-GHz catch: single-line banner tagged "RF". (Board-assisted
+         * catches get their own animated Signal Storm screen instead.) */
         canvas_set_color(canvas, ColorBlack);
         canvas_draw_box(canvas, 0, 52, 128, 12);
         canvas_set_color(canvas, ColorWhite);
         canvas_draw_str(canvas, 3, 61, m->reveal_text);
-        if(m->board_present) {
-            /* signal-storm indicator: 3 rising bars + AP count (white on bar) */
-            int bx = 104, by = 61;
-            canvas_draw_box(canvas, bx, by - 2, 2, 3);
-            canvas_draw_box(canvas, bx + 3, by - 4, 2, 5);
-            canvas_draw_box(canvas, bx + 6, by - 6, 2, 7);
-            char sb[8];
-            snprintf(sb, sizeof(sb), "%u", m->last_wifi);
-            canvas_draw_str(canvas, bx + 10, by, sb);
-        }
+        canvas_draw_str(canvas, 128 - canvas_string_width(canvas, "RF") - 3, 61, "RF");
         canvas_set_color(canvas, ColorBlack);
     } else {
         canvas_draw_line(canvas, 0, 52, 127, 52);

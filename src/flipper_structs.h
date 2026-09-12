@@ -15,6 +15,7 @@
 
 #include <core/thread.h>
 #include <core/message_queue.h>
+#include <core/timer.h>
 
 #include "game_structs.h"
 
@@ -34,8 +35,10 @@ struct ApplicationContext {
     Submenu *care_module;      // care submenu
     View *stats_view;          // custom Stats screen
     View *inventory_view;      // custom Inventory screen
+    View *storm_view;          // custom animated Signal Storm screen
 
     /* Others */
+    FuriTimer *storm_timer;    // animates the Signal Storm screen while open
     FuriThread *secondary_thread;
     FuriMessageQueue *threads_message_queue; // Message queue between main thread, GUI and secondary thread
     struct GameState *game_state; // Read by draw_callback thread, written by the secondary thread

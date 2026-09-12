@@ -24,6 +24,7 @@
 #include "gui/view_dispatcher.h"
 #include "threads.h"
 #include "gui/pet_view.h"
+#include "gui/storm_view.h"
 
 /******************** Initialisation & startup *****************************/
 
@@ -41,6 +42,8 @@ static void init_gui(struct ApplicationContext *context) {
     context->care_module = submenu_alloc();   // Care submenu
     context->stats_view = stats_view_alloc(context); // Stats screen
     context->inventory_view = inventory_view_alloc(context); // Inventory screen
+    context->storm_view = storm_view_alloc(context); // animated Signal Storm screen
+    context->storm_timer = NULL;
 
     // Init ViewDispatcher
     context->view_dispatcher = view_dispatcher_alloc();
@@ -85,6 +88,9 @@ static void init_gui(struct ApplicationContext *context) {
     view_dispatcher_add_view(context->view_dispatcher,
                              scene_journey,
                              text_box_get_view(context->text_box_module));
+    view_dispatcher_add_view(context->view_dispatcher,
+                             scene_storm,
+                             context->storm_view);
 
     // Init GUI and attach the view_dispatcher to it
     context->gui = furi_record_open(RECORD_GUI);
@@ -95,6 +101,7 @@ static void init_gui(struct ApplicationContext *context) {
 
 static void free_gui(struct ApplicationContext *context) {
     /* Free the view_dispatcher */
+    view_dispatcher_remove_view(context->view_dispatcher, scene_storm);
     view_dispatcher_remove_view(context->view_dispatcher, scene_journey);
     view_dispatcher_remove_view(context->view_dispatcher, scene_expedition);
     view_dispatcher_remove_view(context->view_dispatcher, scene_inventory);
@@ -109,6 +116,8 @@ static void free_gui(struct ApplicationContext *context) {
     view_dispatcher_free(context->view_dispatcher);
 
     /* Free the modules */
+    if(context->storm_timer) furi_timer_free(context->storm_timer);
+    storm_view_free(context->storm_view);
     inventory_view_free(context->inventory_view);
     stats_view_free(context->stats_view);
     submenu_free(context->care_module);

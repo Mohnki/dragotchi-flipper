@@ -6,7 +6,7 @@
 typedef struct {
     uint16_t ts, tm, tl;   // treasure small/med/large
     uint32_t hoard;
-    uint16_t eggs_common, eggs_rare;
+    uint16_t eggs_common, eggs_rare, eggs_storm;
     uint16_t prey_caught, eggs_caught;
 } InvModel;
 
@@ -22,7 +22,7 @@ static void inv_draw(Canvas *cv, void *model) {
     canvas_draw_str(cv, 2, 23, buf);
     snprintf(buf, sizeof(buf), "Hoard value: %lu", (unsigned long)m->hoard);
     canvas_draw_str(cv, 2, 33, buf);
-    snprintf(buf, sizeof(buf), "Eggs  %u common  %u rare", (unsigned)m->eggs_common, (unsigned)m->eggs_rare);
+    snprintf(buf, sizeof(buf), "Eggs C:%u R:%u Storm:%u", (unsigned)m->eggs_common, (unsigned)m->eggs_rare, (unsigned)m->eggs_storm);
     canvas_draw_str(cv, 2, 43, buf);
     unsigned total = m->prey_caught + m->ts + m->tm + m->tl + m->eggs_caught;
     snprintf(buf, sizeof(buf), "Caught  prey:%u  eggs:%u", (unsigned)m->prey_caught, (unsigned)m->eggs_caught);
@@ -44,7 +44,7 @@ void inventory_view_update(View *v, const struct GameState *gs) {
     const struct PersistentGameState *p = &gs->persistent;
     with_view_model(v, InvModel * m, {
         m->ts=p->treasure_small; m->tm=p->treasure_med; m->tl=p->treasure_large;
-        m->hoard=p->hoard; m->eggs_common=p->eggs_common; m->eggs_rare=p->eggs_rare;
+        m->hoard=p->hoard; m->eggs_common=p->eggs_common; m->eggs_rare=p->eggs_rare; m->eggs_storm=p->eggs_storm;
         m->prey_caught=p->prey_caught; m->eggs_caught=p->eggs_caught;
     }, true);
 }

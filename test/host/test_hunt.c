@@ -18,6 +18,10 @@ void run_hunt_logic_tests(void) {
     g.persistent.last_forage_time = 1000;
     CHECK(forage_ready(&g, 1000 + FORAGE_COOLDOWN) == true);
     CHECK(forage_ready(&g, 1000 + FORAGE_COOLDOWN - 1) == false);
+    CHECK(forage_cooldown_remaining(&g, 1000) == FORAGE_COOLDOWN);
+    CHECK(forage_cooldown_remaining(&g, 1000 + FORAGE_COOLDOWN - 1) == 1);
+    CHECK(forage_cooldown_remaining(&g, 1000 + FORAGE_COOLDOWN) == 0);
+    CHECK(forage_cooldown_remaining(&g, 5000) == 0); /* long past */
 
     rng_seed(5);
     struct Catch c = catch_roll(50, 1);
@@ -55,6 +59,17 @@ void run_economy_tests(void) {
     CHECK(h.persistent.care_score == HEIR_RARE_CARE);
     CHECK(h.persistent.hoard == 123);
     CHECK(h.persistent.birth_timestamp == 5000);
+
+    /* Storm eggs count as heirs and hatch first with the best head-start. */
+    struct GameState s2 = {0}; game_state_init(&s2, 0);
+    CHECK(has_heir_egg(&s2) == false);
+    s2.persistent.eggs_storm = 1; s2.persistent.eggs_rare = 1;
+    CHECK(has_heir_egg(&s2) == true);
+    s2.persistent.stage = DEAD;
+    hatch_heir(&s2, 7000);
+    CHECK(s2.persistent.eggs_storm == 0);           /* storm egg consumed first */
+    CHECK(s2.persistent.eggs_rare == 1);            /* rare egg preserved */
+    CHECK(s2.persistent.care_score == HEIR_STORM_CARE);
 }
 
 #include "hunt_hw.h"
@@ -99,4 +114,33 @@ void run_signal_storm_tests(void) {
     for(int i = 0; i < 400; i++)
         if(catch_roll(10, 1).category != CATCH_PREY) nob++;
     CHECK(withb > nob);
+
+    /* Guaranteed floor: a strong storm never returns a small-prey dud. */
+    rng_seed(3);
+    for(int i = 0; i < 600; i++) {
+        struct Catch c = storm_catch_roll(10, 1, STORM_FLOOR_APS + 4);
+        CHECK(!(c.category == CATCH_PREY && c.tier == TIER_SMALL));
+    }
+
+    /* Board-exclusive storm egg (tier 2) is reachable in a dense storm... */
+    rng_seed(7); int storm_eggs = 0;
+    for(int i = 0; i < 3000; i++) {
+        struct Catch c = storm_catch_roll(60, 1, 30);
+        if(c.category == CATCH_EGG && c.tier == 2) storm_eggs++;
+    }
+    CHECK(storm_eggs > 0);
+
+    /* ...but a plain sub-GHz forage can NEVER produce a storm egg. */
+    rng_seed(1);
+    for(int i = 0; i < 800; i++) {
+        struct Catch c = catch_roll(95, 1);
+        if(c.category == CATCH_EGG) CHECK(c.tier < 2);
+    }
+
+    /* Applying a storm egg banks it as a lifetime collectible. */
+    struct GameState g = {0}; game_state_init(&g, 0);
+    apply_catch(&g, (struct Catch){CATCH_EGG, 2, 0, 1}, 100);
+    CHECK(g.persistent.eggs_storm == 1);
+    CHECK(g.persistent.eggs_caught == 1);
+    CHECK(g.persistent.eggs_common == 0 && g.persistent.eggs_rare == 0);
 }

@@ -36,7 +36,11 @@ static const char ALIGNMENT_STRING[][6] = {"", "White", "Grey", "Black"};
 #define GAME_STATE_STORAGE_SETTINGS_FILENAME "dragotchi.settings"
 #define GAME_STATE_STORAGE_STATE_PATH APP_DATA_PATH(GAME_STATE_STORAGE_STATE_FILENAME)
 #define GAME_STATE_STORAGE_SETTINGS_PATH APP_DATA_PATH(GAME_STATE_STORAGE_SETTINGS_FILENAME)
-#define GAME_STATE_HEADER_MAGIC 0xD9
+#define GAME_STATE_HEADER_MAGIC 0xDA
 #define GAME_STATE_HEADER_VERSION 0x01
+
+/* App version, shown in the menu header. Keep in sync with application.fam.
+ */
+#define DRAGOTCHI_VERSION "0.4.0"
 
 #endif
