@@ -11,6 +11,7 @@ int main(void) {
     run_integration_tests();
     run_save_tests();
     run_overnight_tests();
+    run_hunt_tests();
     printf(g_fails ? "FAILED (%d)\n" : "ALL OK\n", g_fails);
     return g_fails ? 1 : 0;
 }

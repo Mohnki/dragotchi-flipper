@@ -50,6 +50,15 @@ enum DisplayState {
     DISP_DEAD
 };
 
+enum CatchCategory { CATCH_PREY, CATCH_TREASURE, CATCH_EGG };
+enum CatchTier { TIER_SMALL, TIER_MED, TIER_LARGE };
+struct Catch {
+    uint8_t category; // enum CatchCategory
+    uint8_t tier;     // enum CatchTier (prey/treasure) or rarity (egg: 0 common,1 rare)
+    uint16_t value;   // food or hoard points
+    uint8_t band;     // 0..HUNT_BANDS-1 (flavour)
+};
+
 /* Event flags returned by advance/action functions so the device layer can
  * decide sound/vibration and build the "while you were away" summary. */
 typedef uint32_t GameEventFlags;
@@ -98,6 +107,11 @@ struct PersistentGameState {
     uint8_t attention_call; // 1 = calling with no real need
     uint32_t last_attention_update; // cursor for attention-call checks
     uint32_t last_oldage_update; // cursor for old-age death checks (adult)
+    // --- v0.2 Hunt ---
+    uint32_t hoard;             // treasure points (score)
+    uint16_t eggs_common;       // hatchery
+    uint16_t eggs_rare;
+    uint32_t last_forage_time;  // forage cooldown cursor
 };
 
 struct PersistentSettings {

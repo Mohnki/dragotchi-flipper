@@ -8,3 +8,4 @@ void run_evolution_tests(void);
 void run_integration_tests(void);
 void run_save_tests(void);
 void run_overnight_tests(void);
+void run_hunt_tests(void);
