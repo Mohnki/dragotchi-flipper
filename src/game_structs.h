@@ -146,6 +146,8 @@ struct GameState {
     char reveal_text[24];      // banner text (transient)
     uint8_t journey_ready;     // transient: expedition returned, show log
     char journey_log[96];      // transient: journey log text
+    uint8_t board_present;     // transient: WiFi devboard replied on last forage
+    uint8_t last_wifi;         // transient: nearby AP count from last board probe
 };
 
 #endif

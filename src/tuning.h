@@ -124,6 +124,16 @@
 #define TREASURE_MED   12
 #define TREASURE_LARGE 25
 
+/* ---- ESP32 WiFi devboard "signal storm" enrichment (optional hardware) ----
+ * When the WiFi devboard is attached and reporting, nearby access-point
+ * density raises the effective hunt activity (busier air -> richer catches).
+ * Receive-only; no scanning of our own. */
+#define STORM_PER_AP   3    /* activity points added per nearby AP */
+#define STORM_MAX_BONUS 40  /* cap on the added activity */
+#define STORM_MIN_APS  4    /* >= this many APs is flagged a "signal storm" */
+#define ESP_LINK_BAUD  115200
+#define ESP_PROBE_MS   1500 /* how long to listen for a DRAGO report */
+
 /* ---- v0.2 Economy ---- */
 #define RANK2_MIN 50
 #define RANK3_MIN 200

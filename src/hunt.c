@@ -65,6 +65,18 @@ void apply_catch(struct GameState *gs, struct Catch c, uint32_t now) {
     p->last_forage_time = now;
 }
 
+uint8_t signal_storm_activity(uint8_t base_activity, uint8_t wifi_count) {
+    uint32_t bonus = (uint32_t)wifi_count * STORM_PER_AP;
+    if(bonus > STORM_MAX_BONUS) bonus = STORM_MAX_BONUS;
+    uint32_t a = (uint32_t)base_activity + bonus;
+    if(a > 100) a = 100;
+    return (uint8_t)a;
+}
+
+bool signal_storm_active(uint8_t wifi_count) {
+    return wifi_count >= STORM_MIN_APS;
+}
+
 const char *band_name(uint8_t band) {
     static const char *n[HUNT_BANDS] = {"315", "433", "868", "915"};
     return n[band % HUNT_BANDS];

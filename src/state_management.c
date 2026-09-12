@@ -9,6 +9,7 @@
 #include "save_restore.h"
 #include "hunt.h"
 #include "hunt_hw.h"
+#include "esp_link.h"
 #include "economy.h"
 #include "expedition.h"
 
@@ -62,6 +63,14 @@ GameEventFlags do_forage(struct GameState *gs) {
     }
     uint8_t activity = 0, band = 1;
     hunt_sense(&activity, &band);
+
+    /* Optional WiFi devboard: dense airwaves boost the catch ("signal storm"). */
+    uint8_t wifi = 0;
+    int8_t wrssi = 0;
+    gs->board_present = esp_probe(&wifi, &wrssi) ? 1 : 0;
+    gs->last_wifi = wifi;
+    if(gs->board_present) activity = signal_storm_activity(activity, wifi);
+
     struct Catch c = catch_roll(activity, band);
     apply_catch(gs, c, now);
     gs->last_catch = c;

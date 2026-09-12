@@ -16,6 +16,8 @@ typedef struct {
     char reveal_text[24];
     uint8_t on_expedition;
     uint32_t remaining_sec;
+    uint8_t board_present;
+    uint8_t last_wifi;
 } PetModel;
 
 static const uint8_t HEART[6] = {0x36, 0x7F, 0x7F, 0x3E, 0x1C, 0x08};
@@ -109,6 +111,16 @@ static void pet_draw_callback(Canvas *canvas, void *model) {
         canvas_draw_box(canvas, 0, 52, 128, 12);
         canvas_set_color(canvas, ColorWhite);
         canvas_draw_str(canvas, 3, 61, m->reveal_text);
+        if(m->board_present) {
+            /* signal-storm indicator: 3 rising bars + AP count (white on bar) */
+            int bx = 104, by = 61;
+            canvas_draw_box(canvas, bx, by - 2, 2, 3);
+            canvas_draw_box(canvas, bx + 3, by - 4, 2, 5);
+            canvas_draw_box(canvas, bx + 6, by - 6, 2, 7);
+            char sb[8];
+            snprintf(sb, sizeof(sb), "%u", m->last_wifi);
+            canvas_draw_str(canvas, bx + 10, by, sb);
+        }
         canvas_set_color(canvas, ColorBlack);
     } else {
         canvas_draw_line(canvas, 0, 52, 127, 52);
@@ -153,6 +165,7 @@ void pet_view_update(View *view, const struct GameState *gs, bool night, uint32_
             for(size_t i=0;i<sizeof(m->reveal_text);i++){ m->reveal_text[i]=gs->reveal_text[i]; if(!gs->reveal_text[i]) break; }
             m->reveal_text[sizeof(m->reveal_text)-1]='\0';
             m->on_expedition=p->on_expedition; m->remaining_sec=remaining_sec;
+            m->board_present=gs->board_present; m->last_wifi=gs->last_wifi;
         },
         true);
 }

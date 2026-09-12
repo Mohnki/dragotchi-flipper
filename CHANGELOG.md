@@ -1,3 +1,15 @@
+## 0.4.0 - Signal storm (WiFi devboard)
+ - Optional ESP32-S2 WiFi devboard support: when attached over the GPIO
+   expansion UART and running the reporter firmware (see `esp32/`), Forage also
+   senses nearby WiFi access-point density. A busy area triggers a "signal
+   storm" that boosts catch tiers and egg odds on top of the sub-GHz reading.
+ - Auto-sensing: the game listens ~1.5 s for a `DRAGO wifi=N rssi=X` line during
+   each Forage. Heard -> storm boost + a signal-bars/AP-count indicator on the
+   catch reveal. Not heard -> plays exactly as before. The board is pure
+   enrichment; nothing is required to attach it.
+ - ESP firmware lives in `esp32/` (MicroPython + `main.py`), with a flash script
+   and uploader. The ESP32-S2 is WiFi-only (no BLE), so density = WiFi APs.
+
 ## 0.3.1 - Real airwaves
  - Hunting now reads the REAL sub-GHz airwaves: Forage sweeps 315/433/868/915 MHz,
    measures RSSI (receive-only), and busier surroundings yield better/rarer

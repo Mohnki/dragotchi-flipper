@@ -80,3 +80,23 @@ void run_inventory_tests(void) {
     CHECK(g.persistent.eggs_common == 1);
     CHECK(g.persistent.hoard == 30);
 }
+
+/* Signal-storm (WiFi devboard) enrichment */
+void run_signal_storm_tests(void) {
+    CHECK(signal_storm_activity(50, 0) == 50);            /* no board / no APs */
+    CHECK(signal_storm_activity(50, 5) == 50 + 5 * STORM_PER_AP);
+    CHECK(signal_storm_activity(50, 100) == 50 + STORM_MAX_BONUS); /* bonus capped */
+    CHECK(signal_storm_activity(90, 100) == 100);         /* result clamped to 100 */
+    CHECK(signal_storm_active(STORM_MIN_APS) == true);
+    CHECK(signal_storm_active(STORM_MIN_APS - 1) == false);
+
+    /* Dense WiFi (board present) yields richer catches than quiet air alone:
+     * this is exactly the composition do_forage() uses on-device. */
+    rng_seed(11); int withb = 0;
+    for(int i = 0; i < 400; i++)
+        if(catch_roll(signal_storm_activity(10, 40), 1).category != CATCH_PREY) withb++;
+    rng_seed(11); int nob = 0;
+    for(int i = 0; i < 400; i++)
+        if(catch_roll(10, 1).category != CATCH_PREY) nob++;
+    CHECK(withb > nob);
+}
