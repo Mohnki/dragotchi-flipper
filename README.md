@@ -12,6 +12,12 @@ treasure and eggs, and you can **send it on offline expeditions** for loot and a
 journey log. Attach an ESP32 WiFi devboard and busy airwaves become a **signal
 storm** that enriches your catches.
 
+![The Signal Storm screen: a radar sweep pinging nearby WiFi networks, with a board-exclusive "storm egg" catch](docs/storm-screen.png)
+
+*The animated Signal Storm screen — shown when you hunt with the WiFi devboard
+attached. The radar pings each nearby network; a dense area boosts your catch
+and can drop an exclusive "storm egg."*
+
 ## Status
 
 **v0.4.0** — built for Flipper Zero firmware **1.4.3** (API 87.1). Onboard
