@@ -11,12 +11,18 @@ game plays exactly as before; the board is a pure enrichment.
 
 ## Protocol
 
-The board emits one line at ~1 Hz (and immediately whenever it receives a byte)
-on its UART, at **115200 baud, 8N1**:
+The board continuously transmits the latest reading (~5 lines/second) on its
+UART at **115200 baud, 8N1**, while rescanning WiFi on a slow background timer:
 
 ```
 DRAGO wifi=<ap_count> rssi=<strongest_dbm>
 ```
+
+A WiFi scan blocks for 2–4 s, so the reporter **decouples scanning from
+transmitting** — it re-sends the cached result every ~200 ms and only rescans
+every ~5 s. That keeps fresh data on the wire so the Flipper's short listen
+window during a Forage always catches a line (transmitting once per scan was too
+sparse and got missed most of the time).
 
 The Flipper's expansion USART (pins **13 TX / 14 RX**) is wired by the devboard
 to the ESP's UART0 pins (**GPIO43 TX / GPIO44 RX**). `main.py` writes the report
@@ -54,9 +60,12 @@ You need `esptool` and `pyserial` (`pip install esptool` provides both).
 
 Unplug the devboard from USB and **seat it on the Flipper's GPIO header** (the
 normal WiFi-devboard position). The Flipper powers it from 3V3; MicroPython runs
-`main.py` on boot with no USB attached. Open Dragotchi → **Hunt → Forage**: when
-the board is heard, the catch reveal shows a small **signal-bars + AP-count**
-indicator and your odds get the storm boost.
+`main.py` on boot with no USB attached. Open Dragotchi → **Hunt**: when the board
+is heard, the catch opens the animated **Signal Storm** screen (a sweeping radar
+that pings each nearby network) and your catch gets the storm boost — better
+tiers, a guaranteed floor, WiFi-themed names, and a shot at an exclusive **storm
+egg**. Without the board (or before it has booted) you get the normal sub-GHz
+catch banner instead.
 
 ## Reverting to Marauder
 

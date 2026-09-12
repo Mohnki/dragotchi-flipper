@@ -78,11 +78,15 @@ Full detail in **[esp32/README.md](esp32/README.md)**; summary:
    ./flash.sh /dev/ttyACM1            # default baud; re-enter download mode & retry if it errors
    ./upload_main.py /dev/ttyACM1      # after it reboots as MicroPython (303a:4001)
    ```
-4. Verify it prints `DRAGO wifi=N rssi=X` once a second on the REPL.
+4. Verify it prints `DRAGO wifi=N rssi=X` on the REPL (it streams continuously;
+   the USB `print()` is throttled to ~once per rescan, but the UART stream to the
+   Flipper is ~5/second).
 5. Unplug from USB and **seat the devboard on the Flipper's GPIO header.** The
-   Flipper powers it; it reports over pins 13/14 to the game.
-6. In Dragotchi: **Hunt → Forage.** When the board is heard, the catch reveal
-   shows a small signal-bars + AP-count indicator and your odds get the boost.
+   Flipper powers it; it reports over pins 13/14 to the game. Give it ~5 s to
+   boot and complete its first scan.
+6. In Dragotchi: **Hunt.** When the board is heard, the catch opens the animated
+   **Signal Storm** radar screen (boosted odds, guaranteed floor, WiFi-themed
+   names, exclusive storm eggs). No board → the normal sub-GHz catch banner.
 
 Reverting to Marauder: re-enter download mode and reflash the Marauder image.
 
@@ -115,7 +119,8 @@ save file back over the storage API rather than trying to script inputs.
 | Flipper "hangs" over serial | Often a stuck host process holding the port. Kill it (`fuser -k /dev/ttyACM0`); a genuinely wedged Flipper needs a LEFT+BACK reboot. |
 | Devboard won't appear for flashing | It only shows on USB in **download mode** (hold BOOT + tap RST). Marauder/MicroPython run modes present differently or not at all. |
 | `esptool` errors mid-erase at 460800 | The S2's native USB is flaky at fast-flash baud. Use the default baud (the provided `flash.sh` does) and retry; the chip stays in the bootloader between attempts. |
-| Forage never shows the storm indicator | Board not seated on GPIO, not powered, or not running `main.py`. Check the reporter on USB first (§4.4); confirm it's on the Flipper's pins 13/14. |
+| Forage never opens the Signal Storm screen | Board not seated on GPIO, not powered, or not running `main.py`; or you foraged before it finished booting/scanning (~5 s). Check the reporter on USB first (§4.4); confirm it's on the Flipper's pins 13/14. |
+| "Hunt" does nothing / says "Hunt ready in Ns" | Forage is on its 90 s cooldown. The menu shows "Hunt (Ns)" while cooling down; wait for it to read just "Hunt". |
 | Pet died unexpectedly overnight | By design the pet sleeps 20:00–08:00 (needs pause). If it still dies, it was Health=0 before sleep, or on-expedition resolution — check Stats. |
 
 ---

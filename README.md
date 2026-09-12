@@ -38,8 +38,10 @@ hardware only; the WiFi devboard is optional.
 - **Legacy:** when a dragon dies, hatch an heir egg to continue with a care
   head-start (the hoard persists across the lineage).
 - **Signal storm (optional):** with an ESP32-S2 WiFi devboard running the
-  reporter firmware (`esp32/`), Forage also senses nearby WiFi density for an
-  extra boost. See `esp32/README.md`.
+  reporter firmware (`esp32/`), a hunt in a busy area opens an animated **radar
+  screen** and gets a boost: better tiers, a guaranteed floor, WiFi-themed
+  names, and an exclusive collectible **"storm egg"**. Plays identically with no
+  board attached — it's pure enrichment. See `esp32/README.md`.
 
 ## Building & installing
 
