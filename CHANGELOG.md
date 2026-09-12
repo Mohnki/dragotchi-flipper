@@ -1,3 +1,11 @@
+## 0.2.1 - UI/UX overhaul
+ - Calm main screen: pet + heart meters + a clear "OK: Menu" hint (the confusing
+   one-at-a-time action cycler is gone).
+ - Proper scrollable Menu (OK): Care / Hunt / Stats / Settings, plus Hatch Heir
+   when relevant. Care is its own submenu (Feed/Play/Clean/Medicine/Scold/Lights).
+ - Visual Stats screen (name/age, heart meters, care, rank, hoard, discipline, eggs).
+ - Catch/action reveal moved to a bottom banner so it no longer covers the meters.
+
 ## 0.2.0 - Hunt
  - Forage: a one-tap hunt yields a surprise catch - prey (feeds it), treasure
    (builds a hoard), or a rare egg (hatchery) - with a cooldown + catch banner.

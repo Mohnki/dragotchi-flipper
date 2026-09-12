@@ -11,7 +11,7 @@
 #include <gui/modules/variable_item_list.h>
 #include <gui/modules/dialog_ex.h>
 #include <gui/modules/text_box.h>
-#include <gui/modules/popup.h>
+#include <gui/modules/submenu.h>
 
 #include <core/thread.h>
 #include <core/message_queue.h>
@@ -30,7 +30,9 @@ struct ApplicationContext {
     VariableItemList *variable_item_list_module;
     DialogEx *dialog_ex_module;
     TextBox *text_box_module;
-    Popup *popup_module;
+    Submenu *menu_module;      // main menu
+    Submenu *care_module;      // care submenu
+    View *stats_view;          // custom Stats screen
 
     /* Others */
     FuriThread *secondary_thread;
