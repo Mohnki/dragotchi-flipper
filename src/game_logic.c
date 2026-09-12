@@ -4,6 +4,7 @@
 #include "states.h"
 #include "discipline.h"
 #include "evolution.h"
+#include "expedition.h"
 #include "care.h"
 #include "random_generator.h"
 
@@ -18,6 +19,20 @@ static void refresh_display(struct GameState *gs, uint32_t now) {
 GameEventFlags advance_state(struct GameState *gs, uint32_t now) {
     struct PersistentGameState *p = &gs->persistent;
     if(p->stage == DEAD) { gs->display_state = DISP_DEAD; return EVT_NONE; }
+    if(p->on_expedition) {
+        if(expedition_done(gs, now)) {
+            GameEventFlags rf = expedition_resolve(gs, gs->journey_log, sizeof(gs->journey_log));
+            // resync need cursors so the away period is not retro-decayed
+            p->last_hunger_update = now; p->last_happiness_update = now; p->last_health_update = now;
+            p->last_poop_update = now; p->last_sick_update = now; p->last_sleep_update = now;
+            p->last_attention_update = now; p->last_oldage_update = now;
+            gs->journey_ready = 1;
+            gs->next_animation_index = 0;
+            return rf;
+        }
+        gs->display_state = DISP_SLEEPING; // away & calm; needs paused
+        return EVT_NONE;
+    }
     GameEventFlags f = EVT_NONE;
     if(p->stage != EGG) {
         f |= advance_hunger(gs, now);

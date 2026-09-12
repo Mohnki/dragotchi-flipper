@@ -18,9 +18,12 @@ GameEventFlags do_action(struct GameState *, enum ThreadsMessageType);
 GameEventFlags do_forage(struct GameState *);
 /* Legacy: hatch an heir egg into a fresh dragon. */
 void do_hatch_heir(struct GameState *);
+/* Send the dragon on an expedition of @minutes. */
+void do_expedition(struct GameState *, uint16_t minutes);
 
 /* Human-readable status text for the Stats screen. */
 void get_state_str(const struct GameState *, char *, size_t);
 /* Is it night right now (for the sleep glyph)? */
 bool state_is_night_now(void);
+uint32_t state_expedition_remaining(const struct GameState *);
 #endif

@@ -27,6 +27,7 @@ static void play_for_flags(struct GameState *gs, GameEventFlags f) {
     else if(f & EVT_STARVING) { play_starvation(gs); vibrate_long(gs); }
     if(f & (EVT_FED | EVT_PLAYED | EVT_CLEANED | EVT_HEALED)) { play_action(gs); vibrate_short(gs); }
     if(f & EVT_CALL) { play_action(gs); vibrate_short(gs); }
+    if(f & EVT_EXPED_RETURN) { play_level_up(gs); vibrate_long(gs); }
 }
 
 int32_t secondary_thread(void *ctx) {
@@ -72,6 +73,11 @@ int32_t secondary_thread(void *ctx) {
                     send_tick_to_scene(context);
                     break;
                 }
+                case PROCESS_EXPEDITION:
+                    do_expedition(context->game_state, (uint16_t)message.arg);
+                    context->game_state->next_animation_index = 0;
+                    send_tick_to_scene(context);
+                    break;
                 case PROCESS_HATCH_HEIR: {
                     do_hatch_heir(context->game_state);
                     play_level_up(context->game_state);
