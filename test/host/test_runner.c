@@ -17,6 +17,7 @@ int main(void) {
     run_inventory_tests();
     run_expedition_defaults_tests();
     run_expedition_logic_tests();
+    run_expedition_advance_tests();
     run_hunt_hw_tests();
     printf(g_fails ? "FAILED (%d)\n" : "ALL OK\n", g_fails);
     return g_fails ? 1 : 0;

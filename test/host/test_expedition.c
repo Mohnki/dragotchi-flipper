@@ -39,3 +39,25 @@ void run_expedition_logic_tests(void) {
     for(int i=0;i<50;i++){ rng_seed(i); struct GameState x=r; expedition_resolve(&x,log,sizeof(log));
         CHECK(x.persistent.on_expedition==0); CHECK(x.persistent.health>=1); }
 }
+
+#include "game_logic.h"
+void run_expedition_advance_tests(void) {
+    char *unused; (void)unused;
+    // paused while away
+    struct GameState s={0}; game_state_init(&s,0);
+    s.persistent.stage=WYRMLING; s.persistent.hunger=80;
+    s.persistent.last_hunger_update=0;
+    expedition_start(&s, EXPED_LONG_MIN, 0);
+    uint32_t midway = (EXPED_LONG_MIN*EXPED_SEC_PER_MIN)/2;
+    advance_state(&s, midway);
+    CHECK(s.persistent.on_expedition==1);
+    CHECK(s.persistent.hunger==80);          // needs paused, no decay
+    // resolves at end
+    rng_seed(7);
+    uint32_t end = EXPED_LONG_MIN*EXPED_SEC_PER_MIN;
+    GameEventFlags f = advance_state(&s, end);
+    CHECK(f & EVT_EXPED_RETURN);
+    CHECK(s.persistent.on_expedition==0);
+    CHECK(s.journey_ready==1);
+    CHECK(s.persistent.last_hunger_update==end); // cursor resynced (no retro-decay)
+}

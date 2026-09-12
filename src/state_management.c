@@ -10,6 +10,7 @@
 #include "hunt.h"
 #include "hunt_hw.h"
 #include "economy.h"
+#include "expedition.h"
 
 GameEventFlags init_state(struct GameState *gs) {
     if(!load_state_from_file(&gs->persistent)) {
@@ -67,6 +68,10 @@ GameEventFlags do_forage(struct GameState *gs) {
     catch_describe(c, gs->reveal_text, sizeof(gs->reveal_text));
     gs->reveal_ticks = 4;
     return EVT_CAUGHT;
+}
+
+void do_expedition(struct GameState *gs, uint16_t minutes) {
+    expedition_start(gs, minutes, game_now());
 }
 
 void do_hatch_heir(struct GameState *gs) {
