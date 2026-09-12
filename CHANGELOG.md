@@ -1,3 +1,9 @@
+## 0.1.2
+ - Heart meters: Hunger / Joy / Health now show as rows of 4 hearts.
+ - Dedicated eating (open-mouth chomp) and sleeping (eyes-closed + Zzz) sprites,
+   plus a poop glyph on screen and state motion/overlays.
+ - Night is now 20:00-08:00 (was 22:00).
+
 ## 0.1.1
  - Fix: pet could die within hours / overnight. Two causes fixed:
    - Uncleaned poop no longer drains health directly (it is a sickness risk,

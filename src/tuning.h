@@ -36,7 +36,7 @@
 #define MAX_POOP 3
 
 /* Sleep window (RTC hours) */
-#define NIGHT_START 22
+#define NIGHT_START 20
 #define NIGHT_END 8
 
 #ifdef DEBUG

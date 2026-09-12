@@ -87,20 +87,41 @@ def dragon_silhouette(scale, frame, horns, big_wings):
         md.ellipse([cx+2, cy+bh-3, cx+8, cy+bh+int(6*s)], fill=1)
     return fn
 
-def eye(dr, hx, hy, mode):
+def eye(dr, hx, hy, mode, closed=False):
     col = WHITE if mode == "black" else BLACK
-    dr.ellipse([hx-2, hy-2, hx+1, hy+1], fill=col)
+    if closed:
+        dr.line([hx-2, hy, hx+2, hy], fill=col)   # closed eye
+    else:
+        dr.ellipse([hx-2, hy-2, hx+1, hy+1], fill=col)
+
+def mouth_open(dr, hx, hy, hr, mode):
+    """Draw an open mouth (a wedge) under the snout for the eating pose."""
+    col = WHITE if mode == "black" else BLACK
+    sx = hx - hr - int(4)
+    dr.polygon([(sx, hy+1), (sx-5, hy+3), (sx, hy+5)], fill=col)
 
 def save(im, name):
     im.save(f"assets/{name}_60x60.png")
 
 def make_dragon(name, scale, horns, big_wings, mode):
+    hx, hy = 30-int(12*scale), 34-int(12*scale)
+    hr = int(8*scale)
     for frame in (0, 1):
         im, dr = new_img()
         fill_shape(im, dr, dragon_silhouette(scale, frame, horns, big_wings), mode)
-        hx, hy = 30-int(12*scale), 34-int(12*scale)
         eye(dr, hx, hy, mode)
         save(im, f"{name}_0{frame}")
+    # sleeping pose: eyes closed
+    im, dr = new_img()
+    fill_shape(im, dr, dragon_silhouette(scale, 0, horns, big_wings), mode)
+    eye(dr, hx, hy, mode, closed=True)
+    save(im, f"{name}_sleep")
+    # eating pose: open mouth
+    im, dr = new_img()
+    fill_shape(im, dr, dragon_silhouette(scale, 0, horns, big_wings), mode)
+    eye(dr, hx, hy, mode)
+    mouth_open(dr, hx, hy, hr, mode)
+    save(im, f"{name}_eat")
 
 def make_egg():
     for frame in (0, 1):
