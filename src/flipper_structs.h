@@ -33,6 +33,7 @@ struct ApplicationContext {
     Submenu *menu_module;      // main menu
     Submenu *care_module;      // care submenu
     View *stats_view;          // custom Stats screen
+    View *inventory_view;      // custom Inventory screen
 
     /* Others */
     FuriThread *secondary_thread;

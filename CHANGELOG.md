@@ -1,3 +1,8 @@
+## 0.2.2 - Inventory
+ - New Inventory screen (Menu -> Inventory): treasure broken down by tier
+   (small/med/large) + total hoard value, eggs by rarity, and lifetime catches
+   (prey / eggs / total). Now tracks per-tier treasure and lifetime catch counts.
+
 ## 0.2.1 - UI/UX overhaul
  - Calm main screen: pet + heart meters + a clear "OK: Menu" hint (the confusing
    one-at-a-time action cycler is gone).

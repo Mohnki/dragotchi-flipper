@@ -8,7 +8,7 @@
 #include "../../flipper_structs.h"
 #include "../../constants.h"
 
-enum { MENU_CARE, MENU_HUNT, MENU_STATS, MENU_SETTINGS, MENU_HEIR };
+enum { MENU_CARE, MENU_HUNT, MENU_INVENTORY, MENU_STATS, MENU_SETTINGS, MENU_HEIR };
 
 static void menu_cb(void *ctx, uint32_t index) {
     struct ApplicationContext *c = ctx;
@@ -27,6 +27,7 @@ void scene_menu_on_enter(void *ctx) {
         submenu_add_item(m, "Care", MENU_CARE, menu_cb, c);
         submenu_add_item(m, "Hunt", MENU_HUNT, menu_cb, c);
     }
+    submenu_add_item(m, "Inventory", MENU_INVENTORY, menu_cb, c);
     submenu_add_item(m, "Stats", MENU_STATS, menu_cb, c);
     submenu_add_item(m, "Settings", MENU_SETTINGS, menu_cb, c);
     view_dispatcher_switch_to_view(c->view_dispatcher, scene_menu);
@@ -37,6 +38,7 @@ bool scene_menu_on_event(void *ctx, SceneManagerEvent e) {
     if(e.type != SceneManagerEventTypeCustom) return false;
     switch(e.event) {
         case MENU_CARE: scene_manager_next_scene(c->scene_manager, scene_care); break;
+        case MENU_INVENTORY: scene_manager_next_scene(c->scene_manager, scene_inventory); break;
         case MENU_STATS: scene_manager_next_scene(c->scene_manager, scene_status); break;
         case MENU_SETTINGS: scene_manager_next_scene(c->scene_manager, scene_settings); break;
         case MENU_HUNT: {

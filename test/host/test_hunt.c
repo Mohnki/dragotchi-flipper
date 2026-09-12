@@ -65,3 +65,18 @@ void run_hunt_hw_tests(void) {
     hunt_sense(&a, &b);
     CHECK(a == 80 && b == 2);
 }
+
+void run_inventory_tests(void) {
+    struct GameState g = {0}; game_state_init(&g, 0);
+    apply_catch(&g, (struct Catch){CATCH_TREASURE, TIER_LARGE, 25, 0}, 100);
+    apply_catch(&g, (struct Catch){CATCH_TREASURE, TIER_SMALL, 5, 0}, 200);
+    apply_catch(&g, (struct Catch){CATCH_PREY, TIER_MED, 30, 0}, 300);
+    apply_catch(&g, (struct Catch){CATCH_EGG, 0, 0, 0}, 400);
+    CHECK(g.persistent.treasure_large == 1);
+    CHECK(g.persistent.treasure_small == 1);
+    CHECK(g.persistent.treasure_med == 0);
+    CHECK(g.persistent.prey_caught == 1);
+    CHECK(g.persistent.eggs_caught == 1);
+    CHECK(g.persistent.eggs_common == 1);
+    CHECK(g.persistent.hoard == 30);
+}

@@ -10,6 +10,7 @@
 #include <gui/modules/text_box.h>
 #include <gui/modules/submenu.h>
 #include "gui/stats_view.h"
+#include "gui/inventory_view.h"
 
 #include <core/thread.h>
 #include <core/message_queue.h>
@@ -39,6 +40,7 @@ static void init_gui(struct ApplicationContext *context) {
     context->menu_module = submenu_alloc();   // Main menu
     context->care_module = submenu_alloc();   // Care submenu
     context->stats_view = stats_view_alloc(context); // Stats screen
+    context->inventory_view = inventory_view_alloc(context); // Inventory screen
 
     // Init ViewDispatcher
     context->view_dispatcher = view_dispatcher_alloc();
@@ -74,6 +76,9 @@ static void init_gui(struct ApplicationContext *context) {
     view_dispatcher_add_view(context->view_dispatcher,
                              scene_status,
                              context->stats_view);
+    view_dispatcher_add_view(context->view_dispatcher,
+                             scene_inventory,
+                             context->inventory_view);
 
     // Init GUI and attach the view_dispatcher to it
     context->gui = furi_record_open(RECORD_GUI);
@@ -84,6 +89,7 @@ static void init_gui(struct ApplicationContext *context) {
 
 static void free_gui(struct ApplicationContext *context) {
     /* Free the view_dispatcher */
+    view_dispatcher_remove_view(context->view_dispatcher, scene_inventory);
     view_dispatcher_remove_view(context->view_dispatcher, scene_status);
     view_dispatcher_remove_view(context->view_dispatcher, scene_care);
     view_dispatcher_remove_view(context->view_dispatcher, scene_menu);
@@ -95,6 +101,7 @@ static void free_gui(struct ApplicationContext *context) {
     view_dispatcher_free(context->view_dispatcher);
 
     /* Free the modules */
+    inventory_view_free(context->inventory_view);
     stats_view_free(context->stats_view);
     submenu_free(context->care_module);
     submenu_free(context->menu_module);

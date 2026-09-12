@@ -115,6 +115,12 @@ struct PersistentGameState {
     uint16_t eggs_common;       // hatchery
     uint16_t eggs_rare;
     uint32_t last_forage_time;  // forage cooldown cursor
+    // Inventory breakdown (lifetime / current)
+    uint16_t treasure_small;
+    uint16_t treasure_med;
+    uint16_t treasure_large;
+    uint16_t prey_caught;   // lifetime prey
+    uint16_t eggs_caught;   // lifetime eggs (eggs_common/rare are current, decremented on hatch)
 };
 
 struct PersistentSettings {

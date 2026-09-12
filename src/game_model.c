@@ -16,6 +16,8 @@ void game_state_init(struct GameState *gs, uint32_t now) {
     p->discipline = DISCIPLINE_START;
     p->attention_call = 0; p->last_attention_update = now; p->last_oldage_update = now;
     p->hoard = 0; p->eggs_common = 0; p->eggs_rare = 0; p->last_forage_time = 0;
+    p->treasure_small = 0; p->treasure_med = 0; p->treasure_large = 0;
+    p->prey_caught = 0; p->eggs_caught = 0;
     gs->next_animation_index = 0;
     gs->display_state = DISP_IDLE;
 }

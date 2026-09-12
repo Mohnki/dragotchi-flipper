@@ -45,15 +45,20 @@ void apply_catch(struct GameState *gs, struct Catch c, uint32_t now) {
         case CATCH_PREY:
             p->hunger = (p->hunger + c.value > MAX_HU) ? MAX_HU : p->hunger + c.value;
             p->happiness = (p->happiness + 5 > MAX_HAPPINESS) ? MAX_HAPPINESS : p->happiness + 5;
+            p->prey_caught++;
             gs->display_state = DISP_EATING;
             break;
         case CATCH_TREASURE:
             p->hoard += c.value;
+            if(c.tier == TIER_LARGE) p->treasure_large++;
+            else if(c.tier == TIER_MED) p->treasure_med++;
+            else p->treasure_small++;
             gs->display_state = DISP_PLAYING;
             break;
         case CATCH_EGG:
             if(c.tier) p->eggs_rare++;
             else p->eggs_common++;
+            p->eggs_caught++;
             gs->display_state = DISP_PLAYING;
             break;
     }
